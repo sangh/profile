@@ -1,0 +1,102 @@
+
+# Umask that lets the group have permissions to default files.
+umask 0002
+
+[ -f "~/.motd" ] && cat "~/.motd"
+
+# Enable colors for ls, etc.  Prefer ~/.dir_colors #64489
+if [[ -f ~/.dir_colors ]]; then
+	eval `dircolors -b ~/.dir_colors`
+elif [[ -f /etc/DIR_COLORS ]]; then
+	eval `dircolors -b /etc/DIR_COLORS`
+fi
+if ! ls --color >&/dev/null; then
+	alias l='ls -CFh'
+else
+	alias l='ls -CFh --color'
+fi
+alias la='l -a'
+alias ll='la -l'
+alias d='du -hs `\ls -A`'
+if which vim >& /dev/null; then
+	EDITOR=vim
+	VISUAL=vim
+	export EDITOR VISUAL
+	alias v='vim'
+elif which vi >& /dev/null; then
+	EDITOR=vi
+	VISUAL=vi
+	export EDITOR VISUAL
+	alias v='vi'
+fi
+alias c='cd'
+alias cd~='cd ~'
+alias cd-='cd -'
+alias cd..='cd ..'
+alias mv='mv -i'
+alias cp='cp -i'
+
+if ! grep --color >&/dev/null; then
+	alias grep="grep --color"
+fi
+alias g='grep -risE'
+alias gr='grep -rinsEH'
+
+
+if ! less -r >&/dev/null; then
+	alias less="less -r"
+fi
+
+# Taking this out because you have to connect to the internet to get success.
+#if ! whois -H >&/dev/null; then
+	#alias whois="whois -H"
+#fi
+alias ps='COLUMNS=400 ps'
+alias p='ps -elf'
+if cal -3 >&/dev/null; then
+	alias cal='cal -3'
+fi
+
+# Path stuff.
+pathmunge () {
+	if ! echo ":${PATH}:" | grep ":${1}:" >&/dev/null; then
+		if [ "$2" = "after" ] ; then
+			PATH="$PATH:$1"
+		else
+			PATH="$1:$PATH"
+		fi
+	fi
+}
+
+# User's bin is more important than everything.
+pathmunge "~/bin"
+# san'- is after everything
+pathmunge "~/profile-san" after
+# finally the local dir
+pathmunge "." after
+
+export PATH
+unset pathmunge
+
+# This let's you have small typos in the "cd" cmd.
+shopt -s cdspell
+
+# Change the window title of X terminals
+case $TERM in
+	xterm*|rxvt|Eterm|eterm)
+		PROMPT_COMMAND='echo -ne "\033]0;${USER}@${HOSTNAME%%.*}:${PWD/$HOME/~}\007"'
+		;;
+	screen)
+		PROMPT_COMMAND='echo -ne "\033_${USER}@${HOSTNAME%%.*}:${PWD/$HOME/~}\033\\"'
+		;;
+esac
+
+# This is my new fancy prompt command.
+# ###    This MUST happen after any other PROMPT_COMMAND things.
+if [ "$TERM" == "screen" ]; then
+	[[ -f "~/profile-san/prompt_command-time" ]] && . "~/profile-san/prompt_command-time"
+fi
+
+# HISTORY things
+shopt -s histappend
+export HISTIGNORE="&:[ ]*:exit"
