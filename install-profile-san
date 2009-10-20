@@ -1,23 +1,66 @@
 #!/bin/bash
 
+echo
+
+
+if ! [[ -e "$HOME/.ssh" ]]; then
+    echo "Creating and chmoding the \"$HOME/.ssh\" dir."
+    mkdir "$HOME/.ssh"
+    chmod go-rwxXst "$HOME/.ssh"
+fi
+if [[ -d "$HOME/.ssh" ]]; then
+    # Needs to be a separate conditional.
+    if ! [[ -e "$HOME/.ssh/config" ]]; then
+        echo "Creating and chmoding the \"$HOME/.ssh/config\" file."
+        touch "$HOME/.ssh/config"
+        chmod go-rwxXst "$HOME/.ssh/config"
+    fi
+    if grep '^Host clock$' "$HOME/.ssh/config" >&/dev/null; then
+        echo "------------------  The Clock found in SSH config."
+    else
+        echo "Adding The Clock to \"$HOME/.ssh/config\"."
+        echo >> "$HOME/.ssh/config"
+        echo "# Added by $0" >> "$HOME/.ssh/config"
+        echo "Host clock" >> "$HOME/.ssh/config"
+        echo "HostName clockwatching.net" >> "$HOME/.ssh/config"
+        echo "User $USER" >> "$HOME/.ssh/config"
+    fi
+else
+    echo "\"$HOME/.ssh\" is not a dir?  What?" >&2
+fi
+
+
+echo
+
 
 if ! [[ -f "$HOME/.bashrc" ]]; then
     echo "Creating a \"$HOME/.bashrc\" file."
 fi
-echo "Appending \". $HOME/profile-san/bashrc_common\" to \"$HOME/.bashrc\""
-echo >> "$HOME/.bashrc"
-echo "# Added by $0" >> "$HOME/.bashrc"
-echo ". \"$HOME/profile-san/bashrc_common\"" >> "$HOME/.bashrc"
+if grep "^[.] \"$HOME/profile-san/bashrc_common\"\$" "$HOME/.bashrc" >&/dev/null; then
+    echo "------------------  Found \"$HOME/profile-san/bashrc_common\" in \"$HOME/.bashrc\"."
+else
+    echo "Appending \". $HOME/profile-san/bashrc_common\" to \"$HOME/.bashrc\""
+    echo >> "$HOME/.bashrc"
+    echo "# Added by $0" >> "$HOME/.bashrc"
+    echo ". \"$HOME/profile-san/bashrc_common\"" >> "$HOME/.bashrc"
+fi
+
 
 echo
+
 
 if ! [[ -f "$HOME/.vimrc" ]]; then
     echo "Creating a \"$HOME/.vimrc\" file."
 fi
-echo "Appending \"source $HOME/profile-san/vimrc_common\" to \"$HOME/.vimrc\""
-echo >> "$HOME/.vimrc"
-echo "\" Added by $0" >> "$HOME/.vimrc"
-echo "source $HOME/profile-san/vimrc_common" >> "$HOME/.vimrc"
+if grep "^source $HOME/profile-san/vimrc_common\$" "$HOME/.vimrc" >&/dev/null; then
+    echo "------------------  Found \"$HOME/profile-san/vimc_common\" in \"$HOME/.vimrc\"."
+else
+    echo "Appending \"source $HOME/profile-san/vimrc_common\" to \"$HOME/.vimrc\""
+    echo >> "$HOME/.vimrc"
+    echo "\" Added by $0" >> "$HOME/.vimrc"
+    echo "source $HOME/profile-san/vimrc_common" >> "$HOME/.vimrc"
+fi
 
 echo
-echo Done.
+echo "------------------  Done."
+echo
