@@ -1,0 +1,121 @@
+set nocompatible	" Use Vim defaults (much better!)
+set bs=2		" allow backspacing over everything in insert mode
+"set ai			" always set autoindenting on
+set nobackup		" no   keep a backup file
+set viminfo='20,\"50	" read/write a .viminfo file, don't store more
+			" than 50 lines of registers
+set history=50		" keep 50 lines of command line history
+set ruler		" show the cursor position all the time
+set tabstop=4		" set the tab stop, duh!
+set shiftwidth=4	" the autoindent stuff
+set expandtab		" So we get spaces.
+set sts=4
+set pastetoggle=<F11>
+set incsearch		"find as each lettel is typed.
+set scrolloff=5		"Keep five lines showeng around cursor.
+set nottyfast		" Seems to help displaying some files.
+" Options to make long lines not wrap in the buffer, but wrap on-screen at
+" word boundries.
+set tw=0
+set lbr
+set wrap
+
+" Only do this part when compiled with support for autocommands
+if has("autocmd")
+  " In text files, always limit the width of text to 78 characters
+  " I don't want this. autocmd BufRead *.txt set tw=78
+  " When editing a file, always jump to the last cursor position
+  autocmd BufReadPost * if line("'\"") | exe "'\"" | endif
+endif
+
+" Don't use Ex mode, use Q for formatting
+map Q gq
+
+set cindent
+
+" Switch syntax highlighting on, when the terminal has colors
+" Also switch on highlighting the last used search pattern.
+if &t_Co > 2 || has("gui_running")
+  syntax on
+  set hlsearch
+endif
+
+if has("autocmd")
+ augroup cprog
+  " Remove all cprog autocommands
+  au!
+
+  " When starting to edit a file:
+  "   For C and C++ files set formatting of comments and set C-indenting on.
+  "   For other files switch it off.
+  "   Don't change the order, it's important that the line with * comes first.
+  autocmd FileType *      set formatoptions=tcql nocindent comments&
+  autocmd FileType c,cpp  set formatoptions=croql cindent comments=sr:/*,mb:*,el:*/,://
+ augroup END
+
+ augroup gzip
+  " Remove all gzip autocommands
+  au!
+
+  " Enable editing of gzipped files
+  "	  read:	set binary mode before reading the file
+  "		uncompress text in buffer after reading
+  "	 write:	compress file after writing
+  "	append:	uncompress file, append, compress file
+  autocmd BufReadPre,FileReadPre	*.gz set bin
+  autocmd BufReadPost,FileReadPost	*.gz let ch_save = &ch|set ch=2
+  autocmd BufReadPost,FileReadPost	*.gz '[,']!gunzip
+  autocmd BufReadPost,FileReadPost	*.gz set nobin
+  autocmd BufReadPost,FileReadPost	*.gz let &ch = ch_save|unlet ch_save
+  autocmd BufReadPost,FileReadPost	*.gz execute ":doautocmd BufReadPost " . expand("%:r")
+
+  autocmd BufWritePost,FileWritePost	*.gz !mv <afile> <afile>:r
+  autocmd BufWritePost,FileWritePost	*.gz !gzip <afile>:r
+
+  autocmd FileAppendPre			*.gz !gunzip <afile>
+  autocmd FileAppendPre			*.gz !mv <afile>:r <afile>
+  autocmd FileAppendPost		*.gz !mv <afile> <afile>:r
+  autocmd FileAppendPost		*.gz !gzip <afile>:r
+ augroup END
+endif
+
+" This makes search case insensitive when the pattern is all lowercase.
+set ignorecase
+set smartcase
+
+" this is for ispell, use by typing ":is"
+let IspellLang = 'english'
+let PersonalDict = '~/.ispell_' . IspellLang
+execute 'set dictionary+=' . PersonalDict
+set dictionary+=/usr/dict/words
+set complete=.,w,k
+set infercase
+execute 'nnoremap :is :w<CR>:!ispell -x -d ' . IspellLang . ' %<CR>:e<CR><CR>'
+
+
+" This is for a spell use by typing ":as", or ":ase", or ":ash"
+execute 'nnoremap :AS :w!<CR>:!aspell check "%"<CR>:e! "%"<CR><CR>'
+execute 'nnoremap :AE :w!<CR>:!aspell -e check "%"<CR>:e! "%"<CR><CR>'
+execute 'nnoremap :AH :w!<CR>:!aspell -H check "%"<CR>:e! "%"<CR><CR>'
+execute 'nnoremap :AT :w!<CR>:!aspell -t check "%"<CR>:e! "%"<CR><CR>'
+" Make
+execute 'nnoremap :M :w<CR>:!make<CR>'
+" This is sdate.
+execute 'nnoremap :S :r!sdate<CR>kJ$'
+
+" This is the total thing
+execute 'nnoremap :T yypk!!b0f.lllDA '
+" BC !
+execute 'nnoremap :B !!b'
+" URL convert
+execute 'nnoremap :U !!tr-url-escapes<CR>'
+
+if &term=="xterm"
+     set t_Co=8
+     set t_Sb=^[4%dm
+     set t_Sf=^[3%dm
+endif
+"if &term=="cygwin"
+	"syntax off
+"endif
+

@@ -1,10 +1,11 @@
+#!/bin/bash
 
 # Umask that lets the group have permissions to default files.
 umask 0002
 
-[ -f "~/.motd" ] && cat "~/.motd"
+[ -f "$HOME/.motd" ] && cat "$HOME/.motd"
 
-# Enable colors for ls, etc.  Prefer ~/.dir_colors #64489
+# Enable colors for ls, etc.  Prefer $HOME/.dir_colors #64489
 if [[ -f ~/.dir_colors ]]; then
 	eval `dircolors -b ~/.dir_colors`
 elif [[ -f /etc/DIR_COLORS ]]; then
@@ -69,9 +70,9 @@ pathmunge () {
 }
 
 # User's bin is more important than everything.
-pathmunge "~/bin"
+pathmunge "$HOME/bin"
 # san'- is after everything
-pathmunge "~/profile-san" after
+pathmunge "$HOME/profile-san" after
 # finally the local dir
 pathmunge "." after
 
@@ -94,7 +95,7 @@ esac
 # This is my new fancy prompt command.
 # ###    This MUST happen after any other PROMPT_COMMAND things.
 if [ "$TERM" == "screen" ]; then
-	[[ -f "~/profile-san/prompt_command-time" ]] && . "~/profile-san/prompt_command-time"
+	[[ -f "$HOME/profile-san/prompt_command-time" ]] && . "$HOME/profile-san/prompt_command-time"
 fi
 
 # HISTORY things

@@ -1,0 +1,41 @@
+#!/usr/bin/perl -w
+use strict;
+
+# This program takes a file as input (or STDIN if no argument or argument
+#  is `-') and sums the first number on each line.  If there is no sign,
+#  a `+' is added.  The format must be a floating point number (possibly
+#  signed) followed by a space followed by whatever (which is ignored).
+#  Comments in the input files can be made by simply prepending a `0 ' at
+#  the begenning of the line; also white-space or empty lines are ignored.
+
+
+if(scalar(@ARGV) > 1) {
+	print STDERR "Only one argument (the filename to sum) allowed, "
+		. scalar(@ARGV) . " given.\n";
+	exit 1;
+} elsif(scalar(@ARGV) == 1) {
+	if($ARGV[0] eq "-") {
+		open(F,  "<&STDIN" ) or die "Couldn't dup STDIN: $!";
+	} else {
+		open(F, "<". $ARGV[0]) or die "Failed to open \"". $ARGV[0] ."\": $!";
+	}
+} else {
+	open(F,  "<&STDIN" ) or die "Couldn't dup STDIN: $!";
+}
+
+my $sum = 0.0;
+while(<F>) {
+	my $line = $_;
+	chomp $line;
+	if($line =~ /^\s*$/) { next; } # Ignore blank lines.
+	# Number forms: 2, -2, +2, 123.3, -23.1, +123.2, .3, +.3, -.3
+	if($line =~ /^[^+-]/) { $line = "+" . $line; } # Possibly add a `+'.
+	if(substr($line, 1, 1) eq ".") { substr($line, 1, 1) = "0."; } # Add 0?
+	if($line =~ /^([+-][0-9]+([.][0-9]+)?)( |$)/) {
+		$sum = $sum + $1;
+	} else {
+		print STDERR "Line did not parse:\n\t$line\n";
+	}
+}
+close(F);
+print $sum . "\n";

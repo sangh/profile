@@ -1,0 +1,23 @@
+#!/bin/bash
+
+
+if ! [[ -f "$HOME/.bashrc" ]]; then
+    echo "Creating a \"$HOME/.bashrc\" file."
+fi
+echo "Appending \". $HOME/profile-san/bashrc_common\" to \"$HOME/.bashrc\""
+echo >> "$HOME/.bashrc"
+echo "# Added by $0" >> "$HOME/.bashrc"
+echo ". \"$HOME/profile-san/bashrc_common\"" >> "$HOME/.bashrc"
+
+echo
+
+if ! [[ -f "$HOME/.vimrc" ]]; then
+    echo "Creating a \"$HOME/.vimrc\" file."
+fi
+echo "Appending \"source $HOME/profile-san/vimrc_common\" to \"$HOME/.vimrc\""
+echo >> "$HOME/.vimrc"
+echo "\" Added by $0" >> "$HOME/.vimrc"
+echo "source $HOME/profile-san/vimrc_common" >> "$HOME/.vimrc"
+
+echo
+echo Done.

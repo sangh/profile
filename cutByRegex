@@ -1,0 +1,52 @@
+#!/usr/bin/python
+
+import sys
+import re
+
+def range2ints(range):
+	reenum = re.compile(r'^[0-9]+$')
+	reerange = re.compile(r'^([0-9]+)[-]([0-9]+)$')
+
+	nums = []
+	for item in range.split(","):
+		rerange = reerange.match(item)
+		if rerange:
+			li = int(rerange.group(1))
+			hi = int(rerange.group(2))
+			if li > hi:
+				print >> sys.stderr, "Range invalid: %s"%(item)
+			else:
+				while li <= hi:
+					nums.append(li)
+					li = li + 1
+		else:
+			renum = reenum.match(item)
+			if renum:
+				nums.append(int(item))
+			else:
+				print >> sys.stderr, "Cannot parse item: %s"%(item)
+
+	return nums
+
+
+# If not one argument.
+if len(sys.argv) != 3:
+	print "First argument needs to be the python-re string to split by."
+	print "And the 2nd needs to be the field."
+	sys.exit(1)
+
+rees = re.compile(sys.argv[1])
+
+for line in sys.stdin:
+	res = rees.split(line)
+	if res:
+		res[-1] = res[-1].rstrip('\n')
+
+		for item in range2ints(sys.argv[2]):
+			item = item - 1
+			if len(res) <= item:
+				print >> sys.stderr, "Field value is larger then returned list."
+			else:
+				print res[item]
+	else:
+		print >> sys.stderr, "Regex failed."

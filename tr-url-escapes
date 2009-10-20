@@ -1,0 +1,112 @@
+#!/usr/bin/python
+
+help="""
+    Usage:  %s [-h] [-?] [--help] [input-file [output-file]]
+
+Translates URL escape codes to regular chars (ex. %20 --> " ").
+If no args or args are `-' the stdin/stdout are used.
+If 1st arg is -h, -?, or --help, then help is printed and no files are opened.
+Will not write to an existing file.
+"""
+
+def tr(s):
+    # Return s if pattern is not found
+    return {
+        "%20": " ",
+        "%0A": "\n",
+        "%0a": "\n",
+		"%3C": "<",
+		"%3c": "<",
+		"%20": " ",
+		"%2E": ">",
+		"%2e": ">",
+		"%23": "#",
+		"%25": "%",
+		"%7B": "{",
+		"%7b": "{",
+		"%7D": "}",
+		"%7d": "}",
+		"%7C": "\|",
+		"%7c": "\|",
+		"%5C": "\\",
+		"%5c": "\\",
+		"%5E": "^",
+		"%5e": "^",
+		"%7E": "~",
+		"%7e": "~",
+		"%5B": "[",
+		"%5b": "[",
+		"%5D": "]",
+		"%5d": "]",
+		"%60": "`",
+		"%3B": ";",
+		"%3b": ";",
+		"%2F": "\/",
+		"%2f": "\/",
+		"%3F": "?",
+		"%3f": "?",
+		"%3A": ":",
+		"%3a": ":",
+		"%40": "@",
+		"%3D": "=",
+		"%3d": "=",
+		"%26": "&",
+		"%24": "$",
+    }.get(s, s)
+
+
+import os
+import sys
+
+if( 3 <  len(sys.argv) ):
+    # More than 2 args
+    print >> sys.stderr, "Too many arguments."
+    print >> sys.stderr, help
+    sys.exit(1)
+elif( 1 == len(sys.argv) ):
+    # No arguments
+    fin = sys.stdin
+    fout = sys.stdout
+elif( "-h" == sys.argv[1] or "-?" == sys.argv[1] or "--help" == sys.argv[1] ):
+    print >> sys.stderr, help
+    sys.exit(0)
+else:
+    if( "-" == sys.argv[1] ):
+        fin = sys.stdin
+    else:
+        fin = open( sys.argv[1], "r" )
+    if( 3 == len( sys.argv ) and "-" != sys.argv[2] ):
+        if( os.path.exists( sys.argv[2] ) ):
+            print >> sys.stderr, "Output file \"%s\" exists."%( sys.argv[2] )
+            sys.exit(2)
+        else:
+            fout = open(sys.argv[2], "w")
+    else:
+        fout = sys.stdout
+
+
+
+while( True ):
+    c = fin.read(1)
+    if( "" == c ): # EOF
+        break
+    elif( "%" == c ):
+        # Start proc escape
+        s1 = fin.read(1)
+        if( "" == s1 ): # EOF
+            fout.write(c)
+            break
+        s2 = fin.read(1)
+        if( "" == s2 ): # EOF
+            fout.write(c)
+            fout.write(s1)
+            break
+        fout.write( tr( c + s1 + s2 ) )
+    elif( "&" == c ):
+        fout.write("\n")
+    else:
+        fout.write(c)
+
+
+fin.close()
+fout.close()
