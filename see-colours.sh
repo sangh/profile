@@ -23,5 +23,3 @@ e "Comment   \033[00;34m(Colour Example)\033[00m(Norm: Blue  ) is 255 127 80"
 
 
 e
-
-# Dummy
