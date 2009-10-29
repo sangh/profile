@@ -32,7 +32,7 @@ def range2ints(range):
 # If not one argument.
 if len(sys.argv) != 3:
 	print "First argument needs to be the python-re string to split by."
-	print "And the 2nd needs to be the field."
+	print "And the 2nd needs to be the field set (commas and hypens)."
 	sys.exit(1)
 
 rees = re.compile(sys.argv[1])

@@ -5,8 +5,9 @@ use strict;
 #  is `-') and sums the first number on each line.  If there is no sign,
 #  a `+' is added.  The format must be a floating point number (possibly
 #  signed) followed by a space followed by whatever (which is ignored).
-#  Comments in the input files can be made by simply prepending a `0 ' at
-#  the begenning of the line; also white-space or empty lines are ignored.
+#  Comments in the input files can be made by simply prepending a `0 ',
+#  that is a zero-space at the begenning of the line
+#  All white-space-only or empty lines are ignored.
 
 
 if(scalar(@ARGV) > 1) {
