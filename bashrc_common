@@ -121,4 +121,4 @@ fi
 
 # HISTORY things
 shopt -s histappend
-export HISTIGNORE="&:[ ]*:exit"
+export HISTIGNORE="&:[ ]*:bg:fg:exit"
