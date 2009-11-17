@@ -1,20 +1,21 @@
 $if Bash
-  set bell-style visible
 
-  set completion-ignore-case on
+    set bell-style visible
 
-  # One tab does the completion.
-  set show-all-if-ambiguous on
+    set completion-ignore-case on
 
-  # Append "/" to all dirnames
-  set mark-directories on
-  set mark-symlinked-directories on
+    # One tab does the completion.
+    set show-all-if-ambiguous on
 
-  # Match all files
-  set match-hidden-files on
+    # Append "/" to all dirnames
+    set mark-directories on
+    set mark-symlinked-directories on
 
-  # 'Magic Space'
-  # Insert a space character then performs
-  # a history expansion in the line
-  Space: magic-space
+    # Match all files
+    set match-hidden-files on
+
+    # 'Magic Space'
+    # Insert a space character then performs
+    # a history expansion in the line
+    Space: magic-space
 $endif
