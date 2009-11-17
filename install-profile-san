@@ -33,6 +33,22 @@ fi
 echo
 
 
+if ! [[ -f "$HOME/.inputrc" ]]; then
+    echo "Creating a \"$HOME/.inputrc\" file."
+fi
+if grep "^[\$]include \"$HOME/profile-san/inputrc_common\"\$" "$HOME/.inputrc" >&/dev/null; then
+    echo "------------------  Found \"$HOME/profile-san/inputrc_common\" in \"$HOME/.inputrc\"."
+else
+    echo "Appending \"\$include $HOME/profile-san/inputrc_common\" to \"$HOME/.inputrc\""
+    echo >> "$HOME/.inputrc"
+    echo "# Added by $0" >> "$HOME/.inputrc"
+    echo "\$include \"$HOME/profile-san/inputrc_common\"" >> "$HOME/.inputrc"
+fi
+
+
+echo
+
+
 if ! [[ -f "$HOME/.bashrc" ]]; then
     echo "Creating a \"$HOME/.bashrc\" file."
 fi
