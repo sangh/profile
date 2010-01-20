@@ -1,6 +1,7 @@
 #!/usr/bin/perl -w
 use strict;
 
+
 # This program takes a file as input (or STDIN if no argument or argument
 #  is `-') and sums the first number on each line.  If there is no sign,
 #  a `+' is added.  The format must be a floating point number (possibly
