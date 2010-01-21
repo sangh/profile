@@ -1,6 +1,7 @@
 #!/usr/bin/perl -w
 use strict;
 
+# sumlines [--before {date}] [--] <file>
 
 # This program takes a file as input (or STDIN if no argument or argument
 #  is `-') and sums the first number on each line.  If there is no sign,
@@ -9,8 +10,14 @@ use strict;
 #  Comments in the input files can be made by simply prepending a `0 ',
 #  that is a zero-space at the begenning of the line
 #  All white-space-only or empty lines are ignored.
+#  If --before is specified then only entries begore that date are used.
+#  If -- is spcified that anything after it is considered a file:
+#       sumlines -- -
+#  will try and open a file named ``-'' in the current dir.
 
 
+# Parse args.
+# 
 if(scalar(@ARGV) > 1) {
 	print STDERR "Only one argument (the filename to sum) allowed, "
 		. scalar(@ARGV) . " given.\n";
