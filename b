@@ -15,5 +15,7 @@ fi
 if [ -z "$*" ]; then
 	$bc
 else
-	echo "$@" | $bc | strtr "\n" " = $*\n"
+	echo "s/\$/ = ${*//\//\/}/"
+	echo "$@" | $bc | sed -e "s/\$/ = ${*//\//\/}/"
+	#echo "$@" | $bc | strtr "\n" " = $*\n"
 fi
