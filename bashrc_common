@@ -1,7 +1,21 @@
 #!/bin/bash
 
+
+
 # Umask that lets the group have permissions to default files.
 umask 0002
+
+
+
+
+# If this shell is not interactive, do nothing below this.
+if [ -z "$PS1" ]; then
+    # This shell is not interactive.
+    return
+fi
+
+
+
 
 [ -f "$HOME/.motd" ] && cat "$HOME/.motd"
 
