@@ -1,4 +1,11 @@
 #!/bin/sh
 search="$1"
+if [[ '$' != "${search: -1:1}" ]]; then
+    search="$search"'.*'
+fi
+if [[ '^' != "${search:0:1}" ]]; then
+    search='.*'"$search"
+fi
+
 shift
-find . -follow -iregex \.\*"$search"\.\* "$@"
+find . -follow -iregex "$search" "$@"
