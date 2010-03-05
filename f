@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 search="$1"
 if [[ '$' != "${search: -1:1}" ]]; then
     search="$search"'.*'
