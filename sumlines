@@ -31,9 +31,13 @@ Flags (short flags must be separate arguments):
     --resetAfterZero
         Reset everything (printing) after sum hits zero.
 
-    -p
+    -t
     --printHTML
         Print lines in an HTML table, and do not print the sum.
+
+    -p
+    --printParsed
+        Print out the parsed lines, and the sum, mostly for debugging
 
     --
         Treat all following arguments as something other than flags.
@@ -59,6 +63,7 @@ igroneFutureDates = False
 quiet = False
 resetAfterZero = False
 printHTML = False
+printParsed = False
 
 
 def wrn( s ):
@@ -102,9 +107,10 @@ noMoreFlags = False
 for arg in sys.argv[1:] :
     if( noMoreFlags ) : args.append( arg )
     elif "-i" == arg or "--igroneFutureDates" == arg : igroneFutureDates = True
-    elif "-q" == arg or "--quiet" == arg             : quiet = True
-    elif "-z" == arg or "--resetAfterZero" == arg    : resetAfterZero = True
-    elif "-p" == arg or "--printHTML" == arg         : printHTML = True
+    elif "-q" == arg or "--quiet" == arg             : quiet             = True
+    elif "-z" == arg or "--resetAfterZero" == arg    : resetAfterZero    = True
+    elif "-t" == arg or "--printHTML" == arg         : printHTML         = True
+    elif "-p" == arg or "--printParsed" == arg       : printParsed       = True
     elif "-h" == arg or "-?" == arg  or  "--help" == arg :
         print >> sys.stderr, help
         sys.exit( 0 )
@@ -184,8 +190,12 @@ for line in fin:
     # Save for later.
     lineStore.append( [ amount, line_date, additon_at_end ] )
 
-if printHTML:
+if printHTML :
     err( "printHTML not yet implemented." )
-else:
-    # Finally print the total.
-    print total
+
+if printParsed :
+    for line in lineStore :
+        print line
+
+# Finally print the total.
+print total
