@@ -146,13 +146,16 @@ if False :
 
 
 
-reblank = re.compile("""^\s*$""")
 # Number forms: 2, -2, +2, 123.3, -23.1, +123.2, .3, +.3, -.3
 amount_str = """[+-]?\d*[.]?\d+"""
 date_str = """\d{2}(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\d{2}|\d{4}-[01]\d-[0123]\d"""
-rel = re.compile ("""^\s*(%s)(\s.*|$)"""%amount_str)
-redate = re.compile(""".*\s(%s)\s(.*)$"""%date_str)
-reblank = re.compile("""^\s*$""")
+# The above two are delimiters of sorts, the line con look like:
+# amt desc date explain.
+# amt is always at the bigining of the line, capture rest of line.
+reamt = re.compile ("""^\s*(%s)(\s.*|$)"""%amount_str)
+# Capture the befroe and after of the date.
+redate = re.compile("""(^|.*\s)(%s)(\s.*|$)"""%date_str)
+
 
 # Check today's date.
 if not re.match(date_str, today_date):
@@ -161,41 +164,59 @@ if not re.match(date_str, today_date):
 today_date_num = date_to_number( today_date )
 
 
+
 total = 0.0
 
 lineStore = []
 
-for line in fin:
-    relm = rel.match(line)
-    if not relm:
-        if not reblank.match(line):
+for line in fin :
+    reamtm = reamt.match(line)
+    if not reamtm :
+        if "" != line.strip() :
             wrn("Line not matched: " + line.strip())
         continue
-    amount = float( relm.group( 1 ) )
-    # Now see if there is a date
-    redatem = redate.match( relm.group( 2 ) )
-    if redatem:
-        line_date = redatem.group( 1 )
-        line_date_num = date_to_number( line_date )
-        additon_at_end = redatem.group( 2 )
-    else:
-        line_date = ""
-        line_date_num = oldest_possible_date_num
-        additon_at_end = ""
+    line_amt = float( reamtm.group( 1 ) )
+    line_desc = ""
+    line_date = ""
+    line_date_num = oldest_possible_date_num
+    line_expl = ""
+    # group 2 is always there, but may be blank.
+    date_part_line = reamtm.group( 2 ).strip()
+    if "" != date_part_line :
+        # See if there is a date
+        redatem = redate.match( date_part_line )
+        if redatem :
+            line_desc = redatem.group( 1 ).strip()
+            line_date = redatem.group( 2 )
+            line_date_num = date_to_number( line_date )
+            line_expl = redatem.group( 3 ).strip()
+        else :
+            line_desc = date_part_line
+
     # We only count lines today or older.
     if not igroneFutureDates  and  today_date_num < line_date_num:
         wrn("Not using future date: " + line.strip())
-    else:
-        total = total + amount
-    # Save for later.
-    lineStore.append( [ amount, line_date, additon_at_end ] )
+        continue
 
+    total = total + line_amt
+    # Should we clear the line buffer?
+    if resetAfterZero  and  total < .00001  and  total > -.00001 :
+        lineStore = []
+    else :
+        # Save for later.
+        lineStore.append( [ line_amt, line_desc, line_date, line_expl ] )
+
+# Now we do things with the parsed
 if printHTML :
     err( "printHTML not yet implemented." )
+
+    # Exit after printing the HTML table.
+    sys.exit( 0 )
+
 
 if printParsed :
     for line in lineStore :
         print line
 
 # Finally print the total.
-print total
+print "%.2f" % ( total )
