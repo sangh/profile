@@ -1,44 +1,191 @@
-#!/usr/bin/perl -w
-use strict;
+#!/usr/bin/python
 
-# This program takes a file as input (or STDIN if no argument or argument
-#  is `-') and sums the first number on each line.  If there is no sign,
-#  a `+' is added.  The format must be a floating point number (possibly
-#  signed) followed by a space followed by whatever (which is ignored).
-#  Comments in the input files can be made by simply prepending a `0 ',
-#  that is a zero-space at the begenning of the line
-#  All white-space-only or empty lines are ignored.
+import datetime
+import sys
+import re
+
+# New python implementation of sumlines.
+# This isn't quite as loose as the old sumlines.
+
+# If any line of output contains a `:' then it should be
+# treated as a warning by the display program.
+
+help = """
+
+Usage:  %s [flag1, flag2, ...] [date] [filename]
+
+    By default only print the sum of the lines.
 
 
-# Parse args.
-# 
-if(scalar(@ARGV) > 1) {
-	print STDERR "Only one argument (the filename to sum) allowed, "
-		. scalar(@ARGV) . " given.\n";
-	exit 1;
-} elsif(scalar(@ARGV) == 1) {
-	if($ARGV[0] eq "-") {
-		open(F,  "<&STDIN" ) or die "Couldn't dup STDIN: $!";
-	} else {
-		open(F, "<". $ARGV[0]) or die "Failed to open \"". $ARGV[0] ."\": $!";
-	}
-} else {
-	open(F,  "<&STDIN" ) or die "Couldn't dup STDIN: $!";
-}
+Flags (short flags must be separate arguments):
 
-my $sum = 0.0;
-while(<F>) {
-	my $line = $_;
-	chomp $line;
-	if($line =~ /^\s*$/) { next; } # Ignore blank lines.
-	# Number forms: 2, -2, +2, 123.3, -23.1, +123.2, .3, +.3, -.3
-	if($line =~ /^[^+-]/) { $line = "+" . $line; } # Possibly add a `+'.
-	if(substr($line, 1, 1) eq ".") { substr($line, 1, 1) = "0."; } # Add 0?
-	if($line =~ /^([+-][0-9]+([.][0-9]+)?)( |$)/) {
-		$sum = $sum + $1;
-	} else {
-		print STDERR "Line did not parse:\n\t$line\n";
-	}
-}
-close(F);
-print $sum . "\n";
+    -i
+    --igroneFutureDates
+        Do not treat future dates specially.
+
+    -q
+    --quiet
+        Do not print warnings.
+
+    -z
+    --resetAfterZero
+        Reset everything (printing) after sum hits zero.
+
+    -p
+    --printHTML
+        Print lines in an HTML table, and do not print the sum.
+
+    --
+        Treat all following arguments as something other than flags.
+
+    -?
+    -h
+    --help
+        Print this help and exit.
+
+
+Date (default: today):
+
+    Date, in the format ddmmmyy or yyyy-mm-dd, like 01Jan10, 31Oct08, or 2204-10-30.
+
+
+Filename (default: stdin):
+
+    Filename to open, do not provide for stdin.
+
+""" % ( sys.argv[0], )
+
+igroneFutureDates = False
+quiet = False
+resetAfterZero = False
+printHTML = False
+
+
+def wrn( s ):
+    if( not quiet ):
+        print >> sys.stderr, "Warning: %s"%s
+def err( s ):
+    print
+    print >> sys.stderr, "Error: %s"%s
+    print
+    print >> sys.stderr, help
+    sys.exit( 1 )
+
+
+oldest_possible_date_num = "0000-00-00"
+
+def date_to_number( d ):
+    day = d[0:2]
+    mon = d[2:5]
+    yea = d[5:7]
+    if  ( mon == "Jan" ): mon = "01"
+    elif( mon == "Feb" ): mon = "02"
+    elif( mon == "Mar" ): mon = "03"
+    elif( mon == "Apr" ): mon = "04"
+    elif( mon == "May" ): mon = "05"
+    elif( mon == "Jun" ): mon = "06"
+    elif( mon == "Jul" ): mon = "07"
+    elif( mon == "Aug" ): mon = "08"
+    elif( mon == "Sep" ): mon = "09"
+    elif( mon == "Oct" ): mon = "10"
+    elif( mon == "Nov" ): mon = "11"
+    elif( mon == "Dec" ): mon = "12"
+    else: return d
+
+    return "20%s-%s-%s"%(yea, mon, day)
+
+
+# OK, so we have the args, and flags could be anywhere, so we take those out
+# right after we remove the program name.
+args = []
+noMoreFlags = False
+for arg in sys.argv[1:] :
+    if( noMoreFlags ) : args.append( arg )
+    elif "-i" == arg or "--igroneFutureDates" == arg : igroneFutureDates = True
+    elif "-q" == arg or "--quiet" == arg             : quiet = True
+    elif "-z" == arg or "--resetAfterZero" == arg    : resetAfterZero = True
+    elif "-p" == arg or "--printHTML" == arg         : printHTML = True
+    elif "-h" == arg or "-?" == arg  or  "--help" == arg :
+        print >> sys.stderr, help
+        sys.exit( 0 )
+    elif "--" == arg : noMoreFlags = True
+    elif "-" == arg[0] : err( "Unknown flag: " + arg )
+    else             : args.append( arg )
+
+# Now we see how big args is.
+if len( args )  > 2 : err( "Too many arguments." )
+if len( args ) == 2 :
+    today_date = args[ 0 ]
+    fin  = open( args[ 1 ] )
+else :
+    # We use today's date
+    today_date = datetime.date.today().strftime("%d%b%y")
+    if len( args ) == 1 :
+        fin  = open( args[ 0 ] )
+    else :
+        fin = sys.stdin
+
+
+
+if False :
+    print "sys.argv = ", sys.argv
+    print "igroneFutureDates = ", igroneFutureDates
+    print "quiet = ", quiet
+    print "resetAfterZero = ", resetAfterZero 
+    print "printHTML = ", printHTML
+    print "args = ", args
+    print "today_date = ", today_date
+    print "fine.name = ", fin.name
+    sys.exit( 0 )
+
+
+
+reblank = re.compile("""^\s*$""")
+# Number forms: 2, -2, +2, 123.3, -23.1, +123.2, .3, +.3, -.3
+amount_str = """[+-]?\d*[.]?\d+"""
+date_str = """\d{2}(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\d{2}|\d{4}-[01]\d-[0123]\d"""
+rel = re.compile ("""^\s*(%s)(\s.*|$)"""%amount_str)
+redate = re.compile(""".*\s(%s)\s(.*)$"""%date_str)
+reblank = re.compile("""^\s*$""")
+
+# Check today's date.
+if not re.match(date_str, today_date):
+    err( "Date argument is not a valid date: " + today_date )
+
+today_date_num = date_to_number( today_date )
+
+
+total = 0.0
+
+lineStore = []
+
+for line in fin:
+    relm = rel.match(line)
+    if not relm:
+        if not reblank.match(line):
+            wrn("Line not matched: " + line.strip())
+        continue
+    amount = float( relm.group( 1 ) )
+    # Now see if there is a date
+    redatem = redate.match( relm.group( 2 ) )
+    if redatem:
+        line_date = redatem.group( 1 )
+        line_date_num = date_to_number( line_date )
+        additon_at_end = redatem.group( 2 )
+    else:
+        line_date = ""
+        line_date_num = oldest_possible_date_num
+        additon_at_end = ""
+    # We only count lines today or older.
+    if not igroneFutureDates  and  today_date_num < line_date_num:
+        wrn("Not using future date: " + line.strip())
+    else:
+        total = total + amount
+    # Save for later.
+    lineStore.append( [ amount, line_date, additon_at_end ] )
+
+if printHTML:
+    err( "printHTML not yet implemented." )
+else:
+    # Finally print the total.
+    print total
