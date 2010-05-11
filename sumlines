@@ -208,7 +208,40 @@ for line in fin :
 
 # Now we do things with the parsed
 if printHTML :
-    err( "printHTML not yet implemented." )
+    import cgi
+    def str_tr( str ):
+        if "" == str : return "-------"
+        else : return cgi.escape( str )
+
+    print """
+<style type="text/css">
+    table#ledger {
+        table-layout: fixed;
+        border-style: none;
+        width: 100%;
+    }
+    td {
+        vertical-align: text-top;
+        padding-bottom: 5px;
+        width: 10%;
+    }
+    .amt { text-align: right; }
+    .date { text-align: center; }
+    .desc { text-align: left; width: 50%; }
+    .expl { text-align: left; width: 30%; }
+</style>
+"""
+    print """\n<table id="ledger">"""
+    for line in lineStore :
+        it = map( str_tr, line[1:] )
+        print "\t<tr>"
+        print """\t\t<td class="amt">%.2f</td>""" % ( line[0] )
+        print """\t\t<td class="date">%s</td>""" % ( it[1] )
+        print """\t\t<td class="desc">%s</td>""" % ( it[0] )
+        print """\t\t<td class="expl">%s</td>""" % ( it[2] )
+        print "\t</tr>"
+    print "</table>"
+
 
     # Exit after printing the HTML table.
     sys.exit( 0 )
