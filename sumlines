@@ -19,9 +19,9 @@ Usage:  %s [flag1, flag2, ...] [date] [filename]
 
 Flags (short flags must be separate arguments):
 
-    -i
-    --igroneFutureDates
-        Do not treat future dates specially.
+    -f
+    --futureDates
+        Do not ignore future dates.
 
     -q
     --quiet
@@ -59,7 +59,7 @@ Filename (default: stdin):
 
 """ % ( sys.argv[0], )
 
-igroneFutureDates = False
+futureDates = False
 quiet = False
 resetAfterZero = False
 printHTML = False
@@ -106,11 +106,11 @@ args = []
 noMoreFlags = False
 for arg in sys.argv[1:] :
     if( noMoreFlags ) : args.append( arg )
-    elif "-i" == arg or "--igroneFutureDates" == arg : igroneFutureDates = True
-    elif "-q" == arg or "--quiet" == arg             : quiet             = True
-    elif "-z" == arg or "--resetAfterZero" == arg    : resetAfterZero    = True
-    elif "-t" == arg or "--printHTML" == arg         : printHTML         = True
-    elif "-p" == arg or "--printParsed" == arg       : printParsed       = True
+    elif "-f" == arg or "--futureDates"     == arg  : futureDates       = True
+    elif "-q" == arg or "--quiet"           == arg  : quiet             = True
+    elif "-z" == arg or "--resetAfterZero"  == arg  : resetAfterZero    = True
+    elif "-t" == arg or "--printHTML"       == arg  : printHTML         = True
+    elif "-p" == arg or "--printParsed"     == arg  : printParsed       = True
     elif "-h" == arg or "-?" == arg  or  "--help" == arg :
         print >> sys.stderr, help
         sys.exit( 0 )
@@ -135,7 +135,7 @@ else :
 
 if False :
     print "sys.argv = ", sys.argv
-    print "igroneFutureDates = ", igroneFutureDates
+    print "futureDates = ", futureDates
     print "quiet = ", quiet
     print "resetAfterZero = ", resetAfterZero 
     print "printHTML = ", printHTML
@@ -194,7 +194,7 @@ for line in fin :
             line_desc = date_part_line
 
     # We only count lines today or older.
-    if not igroneFutureDates  and  today_date_num < line_date_num:
+    if not futureDates  and  today_date_num < line_date_num:
         wrn("Not using future date: " + line.strip())
         continue
 
