@@ -1,5 +1,5 @@
 #!/bin/sh
-exec scala -deprecation "$0" "$@"
+exec scala "$0" "$@"
 !#
 
 import scala.collection.mutable.LinkedList
@@ -107,10 +107,12 @@ def getDeepAbsNames( name: String ): LinkedList[FileAttr] = {
             head = new LinkedList( f, head )
         } else if( f.isDirectory() ) {
             val elems = getDeepAbsNames( f.path )
-            var nx = elems
-            while( null != nx.next ) nx = nx.next
-            nx.next = head
-            head = elems
+            if( null != elems ) {
+                var nx = elems
+                while( null != nx.next ) nx = nx.next
+                nx.next = head
+                head = elems
+            }
         } else {
             throw new java.io.IOException("Not a file or dir? " + f.path)
         }
@@ -120,6 +122,7 @@ def getDeepAbsNames( name: String ): LinkedList[FileAttr] = {
 
 
 var bigPointer = getDeepAbsNames(".")
+
 // bigPointer now has all the files in the current dri (and below).
 // It points to the first file.
 
