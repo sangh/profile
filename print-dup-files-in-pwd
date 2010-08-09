@@ -1,0 +1,155 @@
+#!/bin/sh
+exec scala -deprecation "$0" "$@"
+!#
+
+import scala.collection.mutable.LinkedList
+
+
+/*
+    Has a series of test each can tell if the files are different, but not
+    if they are the same (except the last one).  So if the sizes are different
+    then they are different, but if they are the same, the files could still
+    be different.
+*/
+class FileAttr(val name: String) extends java.io.File(name) {
+
+    if( ! this.exists() )
+        throw new java.io.FileNotFoundException(name)
+
+    val path: String = this.getAbsolutePath()
+
+    // First test
+    val size: Long = this.length()
+
+    // 2nd test
+    lazy val firstBit: List[Byte] = {
+        var ret = List[Byte]()
+        val fis = new java.io.FileInputStream( this )
+        val sz: Int = if( 500 < this.size ) 500 else this.size.asInstanceOf[Int]
+        for( i <- 1 to sz )
+            ret = ( fis.read() - 127 ).asInstanceOf[Byte] :: ret
+        fis.close()
+        ret.reverse
+    }
+
+    // 3rd test
+    lazy val md5: String = {
+        val fis = new java.io.FileInputStream( this )
+        val di = java.security.MessageDigest.getInstance("MD5")
+        di.reset()
+        val bb = new Array[Byte](1000)
+        def upd(): Unit = {
+            val i = fis.read(bb)
+            if( i <= 0 ) return
+            di.update(bb, 0, i)
+            upd()
+        }
+        upd()
+        fis.close()
+        List.fromArray( di.digest() ).map(0xFF & _).map { "%02x".format(_) }.foldLeft(""){_ + _}
+    }
+
+    // 4th (and final test)
+    private def sameAsCharForCharHelper(    a: java.io.FileInputStream,
+                                            b: java.io.FileInputStream
+                                        ): Boolean = {
+        while( true ) {
+            val ai = a.read()
+            if( b.read() != ai ) {
+                return false
+            }
+            if( -1 == ai ) return true
+        }
+        throw new java.io.IOException("Don't know, should not happen.")
+    }
+    def sameAsCharForChar( other: FileAttr ): Boolean = {
+        val thisStream = new java.io.FileInputStream( this )
+        val otherStream= new java.io.FileInputStream( other )
+        val ret = this.sameAsCharForCharHelper( thisStream, otherStream )
+        thisStream.close()
+        otherStream.close()
+        ret
+    }
+
+
+
+    def toStringAllInfo(): String = "%s\n%d: %s\n%s\n%s" format (
+        this.name, this.size, this.path, this.firstBit, this.md5 )
+
+    override def toString(): String = "FileAttr(" + name + ")"
+
+    override def equals( other: Any ): Boolean = {
+        if( other.isInstanceOf[FileAttr] ) {
+            val that: FileAttr = other.asInstanceOf[FileAttr]
+            return ( true
+                && this.size == that.size
+                && this.firstBit == that.firstBit
+                && this.md5 == that.md5
+                && this.sameAsCharForChar( that )
+            )
+        } else {
+            return false
+        }
+    }
+
+}
+
+
+
+def getDeepAbsNames( name: String ): LinkedList[FileAttr] = {
+    val pwd = new FileAttr( name )
+    if( ! pwd.isDirectory() )
+        throw new java.io.IOException("Cannot use getDeepAbsNames on not a dir.")
+    var head: LinkedList[FileAttr] = null
+    for( fname <- pwd.list() ) {
+        val f = new FileAttr( pwd.path + java.io.File.separator + fname )
+        if( f.isFile() ) {
+            head = new LinkedList( f, head )
+        } else if( f.isDirectory() ) {
+            val elems = getDeepAbsNames( f.path )
+            var nx = elems
+            while( null != nx.next ) nx = nx.next
+            nx.next = head
+            head = elems
+        } else {
+            throw new java.io.IOException("Not a file or dir? " + f.path)
+        }
+    }
+    head
+}
+
+
+var bigPointer = getDeepAbsNames(".")
+// bigPointer now has all the files in the current dri (and below).
+// It points to the first file.
+
+if( false ) {
+    var i = bigPointer
+    while( null != i ) {
+        println( i.elem )
+        i = i.next
+    }
+    java.lang.System.exit(0)
+}
+
+
+// big outter loop
+while( null != bigPointer ) {
+
+    var i = bigPointer.next
+    var ilst: List[FileAttr] = List()
+    while( null != i ) {
+        if( i.elem == bigPointer.elem )
+            ilst = i.elem :: ilst
+        i = i.next
+    }
+    if( ! ilst.isEmpty ) {
+        println("-------------------------")
+        println( bigPointer.elem )
+        ilst.reverse.map( e => println(e) )
+        println("-------------------------")
+    }
+
+    bigPointer = bigPointer.next
+
+}
