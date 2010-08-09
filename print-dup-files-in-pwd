@@ -1,8 +1,12 @@
 #!/bin/sh
-exec scala "$0" "$@"
+exec scala -deprecation "$0" "$@"
 !#
 
 import scala.collection.mutable.LinkedList
+import java.io.File
+import java.io.FileNotFoundException
+import java.io.FileInputStream
+import java.io.IOException
 
 
 /*
@@ -11,10 +15,10 @@ import scala.collection.mutable.LinkedList
     then they are different, but if they are the same, the files could still
     be different.
 */
-class FileAttr(val name: String) extends java.io.File(name) {
+class FileAttr(val name: String) extends File(name) {
 
     if( ! this.exists() )
-        throw new java.io.FileNotFoundException(name)
+        throw new FileNotFoundException(name)
 
     val path: String = this.getAbsolutePath()
 
@@ -24,7 +28,7 @@ class FileAttr(val name: String) extends java.io.File(name) {
     // 2nd test
     lazy val firstBit: List[Byte] = {
         var ret = List[Byte]()
-        val fis = new java.io.FileInputStream( this )
+        val fis = new FileInputStream( this )
         val sz: Int = if( 500 < this.size ) 500 else this.size.asInstanceOf[Int]
         for( i <- 1 to sz )
             ret = ( fis.read() - 127 ).asInstanceOf[Byte] :: ret
@@ -34,7 +38,7 @@ class FileAttr(val name: String) extends java.io.File(name) {
 
     // 3rd test
     lazy val md5: String = {
-        val fis = new java.io.FileInputStream( this )
+        val fis = new FileInputStream( this )
         val di = java.security.MessageDigest.getInstance("MD5")
         di.reset()
         val bb = new Array[Byte](1000)
@@ -46,12 +50,13 @@ class FileAttr(val name: String) extends java.io.File(name) {
         }
         upd()
         fis.close()
-        List.fromArray( di.digest() ).map(0xFF & _).map { "%02x".format(_) }.foldLeft(""){_ + _}
+        di.digest().toList.map(0xFF & _).map { "%02x".format(_) }.foldLeft(""){_ + _}
+        //List.fromArray( di.digest() ).map(0xFF & _).map { "%02x".format(_) }.foldLeft(""){_ + _}
     }
 
     // 4th (and final test)
-    private def sameAsCharForCharHelper(    a: java.io.FileInputStream,
-                                            b: java.io.FileInputStream
+    private def sameAsCharForCharHelper(    a: FileInputStream,
+                                            b: FileInputStream
                                         ): Boolean = {
         while( true ) {
             val ai = a.read()
@@ -60,11 +65,11 @@ class FileAttr(val name: String) extends java.io.File(name) {
             }
             if( -1 == ai ) return true
         }
-        throw new java.io.IOException("Don't know, should not happen.")
+        throw new IOException("Don't know, should not happen.")
     }
     def sameAsCharForChar( other: FileAttr ): Boolean = {
-        val thisStream = new java.io.FileInputStream( this )
-        val otherStream= new java.io.FileInputStream( other )
+        val thisStream = new FileInputStream( this )
+        val otherStream= new FileInputStream( other )
         val ret = this.sameAsCharForCharHelper( thisStream, otherStream )
         thisStream.close()
         otherStream.close()
@@ -98,37 +103,47 @@ class FileAttr(val name: String) extends java.io.File(name) {
 
 def getDeepAbsNames( name: String ): LinkedList[FileAttr] = {
     val pwd = new FileAttr( name )
-    if( ! pwd.isDirectory() )
-        throw new java.io.IOException("Cannot use getDeepAbsNames on not a dir.")
-    var head: LinkedList[FileAttr] = null
-    for( fname <- pwd.list() ) {
-        val f = new FileAttr( pwd.path + java.io.File.separator + fname )
+    if( ! pwd.isDirectory )
+        throw new IOException("Cannot use getDeepAbsNames on not a dir.")
+    // What null could be...
+    var ret: LinkedList[FileAttr] = LinkedList()
+    val filesInPwd: Array[String] = pwd.list()
+    // If no files in the dir, return the blank linked list
+    if( null == filesInPwd ) return ret
+
+    for( fname <- filesInPwd ) {
+        val f = new FileAttr( pwd.path + File.separator + fname )
         if( f.isFile() ) {
-            head = new LinkedList( f, head )
+            val tmpll = LinkedList( f )
+            tmpll.next = ret
+            ret = tmpll
         } else if( f.isDirectory() ) {
             val elems = getDeepAbsNames( f.path )
-            if( null != elems ) {
+            if( ! elems.isEmpty ) {
                 var nx = elems
-                while( null != nx.next ) nx = nx.next
-                nx.next = head
-                head = elems
+                while( ! nx.next.isEmpty ) nx = nx.next
+                nx.next = ret
+                ret = elems
             }
         } else {
-            throw new java.io.IOException("Not a file or dir? " + f.path)
+            throw new IOException("Not a file or dir? " + f.path)
         }
     }
-    head
+    ret
 }
+
+
+
 
 
 var bigPointer = getDeepAbsNames(".")
 
-// bigPointer now has all the files in the current dri (and below).
+// bigPointer now has all the files in the current dir (and below).
 // It points to the first file.
 
 if( false ) {
     var i = bigPointer
-    while( null != i ) {
+    while( ! i.isEmpty ) {
         println( i.elem )
         i = i.next
     }
@@ -137,11 +152,11 @@ if( false ) {
 
 
 // big outter loop
-while( null != bigPointer ) {
+while( ! bigPointer.isEmpty ) {
 
     var i = bigPointer.next
     var ilst: List[FileAttr] = List()
-    while( null != i ) {
+    while( ! i.isEmpty ) {
         if( i.elem == bigPointer.elem )
             ilst = i.elem :: ilst
         i = i.next
