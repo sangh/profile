@@ -136,3 +136,6 @@ fi
 # HISTORY things
 shopt -s histappend
 export HISTIGNORE="&:[ ]*:bg:fg:exit"
+
+# When do you _not_ want extended globbing?
+shopt -s extglob
