@@ -19,6 +19,7 @@ set nottyfast		" Seems to help displaying some files.
 set tw=0
 set lbr
 set wrap
+set sm  "Jump cursor display (not the actualy cursor) to the matching paren.
 
 " Only do this part when compiled with support for autocommands
 if has("autocmd")
