@@ -92,7 +92,6 @@ pathmunge "$HOME/profile-san" after
 pathmunge "." after
 
 export PATH
-unset pathmunge
 
 # This let's you have small typos in the "cd" cmd.
 shopt -s cdspell
