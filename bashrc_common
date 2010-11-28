@@ -138,3 +138,7 @@ export HISTIGNORE="&:[ ]*:bg:fg:exit"
 
 # When do you _not_ want extended globbing?
 shopt -s extglob
+
+
+# Aliases to do the recursive svn add/remove.
+alias svn-addremove="svn st | grep '^\?' | awk '{print \$2}' | xargs svn add && svn st | grep '^\!' | awk '{print \$2}' | xargs svn rm"
