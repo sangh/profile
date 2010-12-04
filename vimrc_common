@@ -1,13 +1,15 @@
-set nocompatible	" Use Vim defaults (much better!)
+set nocompatible	" Must be first: use Vim defaults (much better!)
 set bs=2		" allow backspacing over everything in insert mode
 "set ai			" always set autoindenting on
 set nobackup		" no   keep a backup file
+set noswapfile   " If need to load a large file, then turn this off...
 set viminfo='20,\"50	" read/write a .viminfo file, don't store more
 			" than 50 lines of registers
 set history=50		" keep 50 lines of command line history
 set ruler		" show the cursor position all the time
 set tabstop=4		" set the tab stop, duh!
 set shiftwidth=4	" the autoindent stuff
+set shiftround " Use muliple of shiftwith with <>
 set expandtab		" So we get spaces.
 set sts=4
 set pastetoggle=<F11>
@@ -19,7 +21,12 @@ set nottyfast		" Seems to help displaying some files.
 set tw=0
 set lbr
 set wrap
+set showmatch " Shew matching parons
 set sm  "Jump cursor display (not the actualy cursor) to the matching paren.
+
+set hidden "Save the buffer, like when useing :e
+
+set number " Line numbers.
 
 " Only do this part when compiled with support for autocommands
 if has("autocmd")
@@ -31,6 +38,10 @@ endif
 
 " Don't use Ex mode, use Q for formatting
 map Q gq
+
+" OK, this is weird, use ; as well as : for the same thing.
+nnoremap ; :
+" What to do with ; ? (repeart the last f{char} or t.
 
 set cindent
 
