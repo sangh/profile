@@ -1,6 +1,5 @@
 set nocompatible	" Must be first: use Vim defaults (much better!)
 set bs=2		" allow backspacing over everything in insert mode
-"set ai			" always set autoindenting on
 set nobackup		" no   keep a backup file
 set noswapfile   " If need to load a large file, then turn this off...
 set viminfo='20,\"50	" read/write a .viminfo file, don't store more
@@ -9,8 +8,9 @@ set history=50		" keep 50 lines of command line history
 set ruler		" show the cursor position all the time
 set tabstop=4		" set the tab stop, duh!
 set shiftwidth=4	" the autoindent stuff
-set shiftround " Use muliple of shiftwith with <>
+set softtabstop=4
 set expandtab		" So we get spaces.
+set shiftround " Use muliple of shiftwith with <>
 set sts=4
 set pastetoggle=<F11>
 set incsearch		"find as each lettel is typed.
@@ -22,11 +22,38 @@ set tw=0
 set lbr
 set wrap
 set showmatch " Shew matching parons
+" Showmatch
 set sm  "Jump cursor display (not the actualy cursor) to the matching paren.
+set showmode
+set encoding=utf-8
+set ai			" always set autoindenting on
+set showcmd
+set wildmenu
+set wildmode=list:longest
+set visualbell
+set cul  "Cursorline?
+set ttyfast
+set backspace=indent,eol,start
+set laststatus=1  " Only show status if > 2 windows.
+if version > 720
+    set relativenumber  " Line numbers are relative to cursor.
+"    set undofile
+else
+    set number " Line numbers.
+endif
+if version > 730
+    set colorcolumn=80
+endif
+
+" This is totally awesome - remap jj to escape in insert mode.
+" You'll never type jj anyway, so it's great!
+inoremap jj <Esc>
+
+" Do not use modelines, would I want them?
+set modelines=0
 
 set hidden "Save the buffer, like when useing :e
 
-set number " Line numbers.
 
 " Only do this part when compiled with support for autocommands
 if has("autocmd")
@@ -42,6 +69,10 @@ map Q gq
 " OK, this is weird, use ; as well as : for the same thing.
 nnoremap ; :
 " What to do with ; ? (repeart the last f{char} or t.
+" Same with ,
+let mapleader = ","
+" and now \ is what ; used to be.
+nnoremap \ ;
 
 set cindent
 
@@ -98,6 +129,7 @@ endif
 " This makes search case insensitive when the pattern is all lowercase.
 set ignorecase
 set smartcase
+set gdefault  " All substitutions are global
 
 " this is for ispell, use by typing ":is"
 let IspellLang = 'english'
@@ -106,9 +138,10 @@ execute 'set dictionary+=' . PersonalDict
 set dictionary+=/usr/dict/words
 set complete=.,w,k
 set infercase
+
+
+
 execute 'nnoremap :is :w<CR>:!ispell -x -d ' . IspellLang . ' %<CR>:e<CR><CR>'
-
-
 " This is for a spell use by typing ":as", or ":ase", or ":ash"
 execute 'nnoremap :AS :w!<CR>:!aspell check "%"<CR>:e! "%"<CR><CR>'
 execute 'nnoremap :AE :w!<CR>:!aspell -e check "%"<CR>:e! "%"<CR><CR>'
@@ -117,7 +150,7 @@ execute 'nnoremap :AT :w!<CR>:!aspell -t check "%"<CR>:e! "%"<CR><CR>'
 " Make
 execute 'nnoremap :M :w<CR>:!make<CR>'
 " This is sdate.
-execute 'nnoremap :S :r!sdate<CR>kJ$'
+execute 'nnoremap <leader>s :r!sdate<CR>kJ$'
 
 " This is the total thing
 execute 'nnoremap :T yypk!!b0f.lllDA '
@@ -141,4 +174,6 @@ au BufRead,BufNewFile *.scala set filetype=scala
 
 " Change to use verymagic all the time
 nnoremap / /\v
+vnoremap / /\v
 cnoremap %s/ %s/\v
+
