@@ -45,11 +45,15 @@ nnoremap ; :
 
 set cindent
 
+" Highlight all searches.
+set hlsearch
+" Always wrap around.
+set wrapscan
+
 " Switch syntax highlighting on, when the terminal has colors
 " Also switch on highlighting the last used search pattern.
 if &t_Co > 2 || has("gui_running")
   syntax on
-  set hlsearch
 endif
 
 if has("autocmd")
@@ -133,3 +137,8 @@ endif
 
 " Add scala type detecting.
 au BufRead,BufNewFile *.scala set filetype=scala
+
+
+" Change to use verymagic all the time
+nnoremap / /\v
+cnoremap %s/ %s/\v
