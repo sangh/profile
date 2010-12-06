@@ -45,10 +45,6 @@ if version > 730
     set colorcolumn=80
 endif
 
-" This is totally awesome - remap jj to escape in insert mode.
-" You'll never type jj anyway, so it's great!
-inoremap jj <Esc>
-
 " Do not use modelines, would I want them?
 set modelines=0
 
@@ -62,17 +58,6 @@ if has("autocmd")
   " When editing a file, always jump to the last cursor position
   autocmd BufReadPost * if line("'\"") | exe "'\"" | endif
 endif
-
-" Don't use Ex mode, use Q for formatting
-map Q gq
-
-" OK, this is weird, use ; as well as : for the same thing.
-nnoremap ; :
-" What to do with ; ? (repeart the last f{char} or t.
-" Same with ,
-let mapleader = ","
-" and now \ is what ; used to be.
-nnoremap \ ;
 
 set cindent
 
@@ -141,24 +126,6 @@ set infercase
 
 
 
-execute 'nnoremap :is :w<CR>:!ispell -x -d ' . IspellLang . ' %<CR>:e<CR><CR>'
-" This is for a spell use by typing ":as", or ":ase", or ":ash"
-execute 'nnoremap :AS :w!<CR>:!aspell check "%"<CR>:e! "%"<CR><CR>'
-execute 'nnoremap :AE :w!<CR>:!aspell -e check "%"<CR>:e! "%"<CR><CR>'
-execute 'nnoremap :AH :w!<CR>:!aspell -H check "%"<CR>:e! "%"<CR><CR>'
-execute 'nnoremap :AT :w!<CR>:!aspell -t check "%"<CR>:e! "%"<CR><CR>'
-" Make
-execute 'nnoremap :M :w<CR>:!make<CR>'
-" This is sdate.
-execute 'nnoremap <leader>s :r!sdate<CR>kJ$'
-
-" This is the total thing
-execute 'nnoremap :T yypk!!b0f.lllDA '
-" BC !
-execute 'nnoremap :B !!b'
-" URL convert
-execute 'nnoremap :U !!tr-url-escapes<CR>'
-
 if &term=="xterm"
      set t_Co=8
      set t_Sb=^[4%dm
@@ -172,8 +139,50 @@ endif
 au BufRead,BufNewFile *.scala set filetype=scala
 
 
+
+
+
+
+
+" These should be all the remappings
+
+" Don't use Ex mode, use Q for formatting
+map Q gq
+
+" OK, this is weird, use ; as well as : for the same thing.
+nnoremap ; :
+" What to do with ; ? (repeart the last f{char} or t.
+" Same with ,
+let mapleader = ","
+" and now \ is what ; used to be.
+nnoremap \ ;
+
+
+execute 'nnoremap <leader>i :w<CR>:!ispell -x -d ' . IspellLang . ' %<CR>:e<CR><CR>'
+" This is for a spell use by typing ",as", or ",ase", or ",ash"
+execute 'nnoremap <leader>as :w!<CR>:!aspell check "%"<CR>:e! "%"<CR><CR>'
+execute 'nnoremap <leader>ae :w!<CR>:!aspell -e check "%"<CR>:e! "%"<CR><CR>'
+execute 'nnoremap <leader>ah :w!<CR>:!aspell -H check "%"<CR>:e! "%"<CR><CR>'
+execute 'nnoremap <leader>at :w!<CR>:!aspell -t check "%"<CR>:e! "%"<CR><CR>'
+" Make
+execute 'nnoremap <leader>m :w<CR>:!make<CR>'
+" This is sdate.
+execute 'nnoremap <leader>s :r!sdate<CR>kJ$'
+
+" This is the total thing
+execute 'nnoremap <leader>t yypk!!b0f.lllDA '
+" BC !
+execute 'nnoremap <leader>b !!b'
+" URL convert
+execute 'nnoremap <leader>u !!tr-url-escapes<CR>'
+
+
 " Change to use verymagic all the time
 nnoremap / /\v
 vnoremap / /\v
 cnoremap %s/ %s/\v
+
+" This is totally awesome - remap jj to escape in insert mode.
+" You'll never type jj anyway, so it's great!
+inoremap jj <Esc>
 
