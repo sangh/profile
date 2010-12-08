@@ -47,13 +47,13 @@ set cul  "Cursorline?
 set ttyfast
 set backspace=indent,eol,start
 set laststatus=1  " Only show status if > 2 windows.
-if version > 720
+if version > 701
     set relativenumber  " Line numbers are relative to cursor.
 "    set undofile
 else
     set number " Line numbers.
 endif
-if version > 730
+if version > 702
     set colorcolumn=80
 endif
 
