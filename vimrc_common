@@ -1,3 +1,14 @@
+" First we load all the modules.
+" Who knows what they depend on,
+" and we may want to change them later.
+
+filetype off
+set runtimepath+=$HOME/profile-san/vim_dotdir
+call pathogen#runtime_append_all_bundles()
+call pathogen#helptags()
+filetype plugin indent on
+
+
 set nocompatible	" Must be first: use Vim defaults (much better!)
 set bs=2		" allow backspacing over everything in insert mode
 set nobackup		" no   keep a backup file
@@ -18,7 +29,8 @@ set scrolloff=5		"Keep five lines showeng around cursor.
 set nottyfast		" Seems to help displaying some files.
 " Options to make long lines not wrap in the buffer, but wrap on-screen at
 " word boundries.
-set tw=0
+set textwidth=0
+set wrapmargin=0
 set lbr
 set wrap
 set showmatch " Shew matching parons
@@ -70,6 +82,8 @@ set wrapscan
 " Also switch on highlighting the last used search pattern.
 if &t_Co > 2 || has("gui_running")
   syntax on
+  set background=dark
+  colorscheme delek
 endif
 
 if has("autocmd")
