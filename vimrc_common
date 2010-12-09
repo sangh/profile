@@ -2,14 +2,24 @@
 " Who knows what they depend on,
 " and we may want to change them later.
 
+set nocompatible	" Must be first: use Vim defaults (much better!)
+
+" Plugins may use the mapleader...
+let mapleader = ","
+
 filetype off
 set runtimepath+=$HOME/profile-san/vim_dotdir
 call pathogen#runtime_append_all_bundles()
 call pathogen#helptags()
 filetype plugin indent on
 
+" Default for the plugins.
+let g:EnhCommentifyTraditionalMode = 'No'
+let g:EnhCommentifyFirstLineMode = 'No'
+let g:EnhCommentifyBindInInsert = 'No'
 
-set nocompatible	" Must be first: use Vim defaults (much better!)
+
+
 set bs=2		" allow backspacing over everything in insert mode
 set nobackup		" no   keep a backup file
 set noswapfile   " If need to load a large file, then turn this off...
@@ -20,9 +30,9 @@ set ruler		" show the cursor position all the time
 set tabstop=4		" set the tab stop, duh!
 set shiftwidth=4	" the autoindent stuff
 set softtabstop=4
+set sts=4
 set expandtab		" So we get spaces.
 set shiftround " Use muliple of shiftwith with <>
-set sts=4
 set pastetoggle=<F11>
 set incsearch		"find as each lettel is typed.
 set scrolloff=5		"Keep five lines showeng around cursor.
@@ -49,7 +59,8 @@ set backspace=indent,eol,start
 set laststatus=1  " Only show status if > 2 windows.
 if version > 701
     set relativenumber  " Line numbers are relative to cursor.
-"    set undofile
+    set undodir=$HOME/.vimundordir
+    set undofile
 else
     set number " Line numbers.
 endif
@@ -156,8 +167,6 @@ au BufRead,BufNewFile *.scala set filetype=scala
 
 
 
-
-
 " These should be all the remappings
 
 " Don't use Ex mode, use Q for formatting
@@ -165,11 +174,13 @@ map Q gq
 
 " OK, this is weird, use ; as well as : for the same thing.
 nnoremap ; :
+vnoremap ; :
 " What to do with ; ? (repeart the last f{char} or t.
 " Same with ,
-let mapleader = ","
+" Set at top: let mapleader = ","
 " and now \ is what ; used to be.
 nnoremap \ ;
+vnoremap \ ;
 
 
 execute 'nnoremap <leader>i :w<CR>:!ispell -x -d ' . IspellLang . ' %<CR>:e<CR><CR>'
