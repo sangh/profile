@@ -178,7 +178,7 @@ vnoremap ; :
 " What to do with ; ? (repeart the last f{char} or t.
 " Same with ,
 " Set at top: let mapleader = ","
-" and now \ is what ; used to be.
+" and now \ is what ; used to be (re-do last f, F, t, or T).
 nnoremap \ ;
 vnoremap \ ;
 
