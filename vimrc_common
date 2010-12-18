@@ -57,7 +57,7 @@ set cul  "Cursorline?
 set ttyfast
 set backspace=indent,eol,start
 set laststatus=1  " Only show status if > 2 windows.
-if version > 701
+if version > 702
     set relativenumber  " Line numbers are relative to cursor.
     set undodir=$HOME/.vimundordir
     set undofile
