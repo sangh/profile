@@ -195,7 +195,7 @@ execute 'nnoremap <leader>m :w<CR>:!make<CR>'
 execute 'nnoremap <leader>s :r!sdate<CR>kJ$'
 
 " This is the total thing
-execute 'nnoremap <leader>t yypk!!b0f.lllDA '
+execute 'nnoremap <leader>t yypkI.005+(<Esc>A)<Esc>!!b<CR>0f.lllDA<Space>'
 " BC !
 execute 'nnoremap <leader>b !!b'
 " URL convert
