@@ -18,6 +18,9 @@ let g:EnhCommentifyTraditionalMode = 'No'
 let g:EnhCommentifyFirstLineMode = 'No'
 let g:EnhCommentifyBindInInsert = 'No'
 
+" Defaults to home dir.
+let g:yankring_history_file = '.vim_yankring_history'
+
 
 
 set bs=2		" allow backspacing over everything in insert mode
