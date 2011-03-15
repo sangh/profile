@@ -27,6 +27,8 @@ elif [[ -f /etc/DIR_COLORS ]]; then
 fi
 if ! ls --color >&/dev/null; then
 	alias l='ls -CFh'
+    # Makes it work on OSX
+    export CLICOLOR
 else
 	alias l='ls -CFh --color'
 fi
