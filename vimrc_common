@@ -200,9 +200,11 @@ execute 'nnoremap <leader>s :r!sdate<CR>kJ$'
 " This is the total thing
 execute 'nnoremap <leader>t yypkI.005+(<Esc>A)<Esc>!!b<CR>0f.lllDA<Space>'
 " BC !
-execute 'nnoremap <leader>b !!b'
+execute 'nnoremap <leader>b !!b<CR>'
 " URL convert
 execute 'nnoremap <leader>u !!tr-url-escapes<CR>'
+" run addr
+execute 'nnoremap <leader>d !!addr --with-to<CR>'
 
 
 " Change to use verymagic all the time
