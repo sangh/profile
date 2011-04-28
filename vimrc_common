@@ -200,7 +200,7 @@ execute 'nnoremap <leader>b !!b<CR>'
 " URL convert
 execute 'nnoremap <leader>u !!tr-url-escapes<CR>'
 " run addr
-execute 'nnoremap <leader>d !!addr --with-to<CR>'
+execute 'nnoremap <leader>d !!addr<CR>'
 
 
 " Change to use verymagic all the time
