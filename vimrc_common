@@ -32,8 +32,7 @@ set history=50		" keep 50 lines of command line history
 set ruler		" show the cursor position all the time
 set tabstop=4		" set the tab stop, duh!
 set shiftwidth=4	" the autoindent stuff
-set softtabstop=4
-set sts=4
+set softtabstop=4   " Also sts
 set expandtab		" So we get spaces.
 set shiftround " Use muliple of shiftwith with <>
 set pastetoggle=<F11>
