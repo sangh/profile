@@ -1,0 +1,15 @@
+
+Host gh
+HostName github.com
+User git
+IdentityFile ~/.ssh/id_rsa_gh
+
+
+In the cloned dir:
+git config user.email san.gh@clockwatchin
+git config user.name "San GH"
+
+
+
+To clone:
+git clone gh:sangh/LaserShow

@@ -15,16 +15,6 @@ if [[ -d "$HOME/.ssh" ]]; then
         touch "$HOME/.ssh/config"
         chmod go-rwxXst "$HOME/.ssh/config"
     fi
-    if grep '^Host clock$' "$HOME/.ssh/config" >&/dev/null; then
-        echo "------------------  The Clock found in SSH config."
-    else
-        echo "Adding The Clock to \"$HOME/.ssh/config\"."
-        echo >> "$HOME/.ssh/config"
-        echo "# Added by $0" >> "$HOME/.ssh/config"
-        echo "Host clock" >> "$HOME/.ssh/config"
-        echo "HostName clockwatching.net" >> "$HOME/.ssh/config"
-        echo "User $USER" >> "$HOME/.ssh/config"
-    fi
 else
     echo "\"$HOME/.ssh\" is not a dir?  What?" >&2
 fi
@@ -36,13 +26,13 @@ echo
 if ! [[ -f "$HOME/.inputrc" ]]; then
     echo "Creating a \"$HOME/.inputrc\" file."
 fi
-if grep "^[\$]include $HOME/profile-san/inputrc_common\$" "$HOME/.inputrc" >&/dev/null; then
-    echo "------------------  Found \"$HOME/profile-san/inputrc_common\" in \"$HOME/.inputrc\"."
+if grep "^[\$]include $HOME/profile/inputrc_common\$" "$HOME/.inputrc" >&/dev/null; then
+    echo "------------------  Found \"$HOME/profile/inputrc_common\" in \"$HOME/.inputrc\"."
 else
-    echo "Appending \"\$include $HOME/profile-san/inputrc_common\" to \"$HOME/.inputrc\""
+    echo "Appending \"\$include $HOME/profile/inputrc_common\" to \"$HOME/.inputrc\""
     echo >> "$HOME/.inputrc"
     echo "# Added by $0" >> "$HOME/.inputrc"
-    echo "\$include $HOME/profile-san/inputrc_common" >> "$HOME/.inputrc"
+    echo "\$include $HOME/profile/inputrc_common" >> "$HOME/.inputrc"
 fi
 
 
@@ -52,13 +42,13 @@ echo
 if ! [[ -f "$HOME/.bashrc" ]]; then
     echo "Creating a \"$HOME/.bashrc\" file."
 fi
-if grep "^[.] \"$HOME/profile-san/bashrc_common\"\$" "$HOME/.bashrc" >&/dev/null; then
-    echo "------------------  Found \"$HOME/profile-san/bashrc_common\" in \"$HOME/.bashrc\"."
+if grep "^[.] \"$HOME/profile/bashrc_common\"\$" "$HOME/.bashrc" >&/dev/null; then
+    echo "------------------  Found \"$HOME/profile/bashrc_common\" in \"$HOME/.bashrc\"."
 else
-    echo "Appending \". $HOME/profile-san/bashrc_common\" to \"$HOME/.bashrc\""
+    echo "Appending \". $HOME/profile/bashrc_common\" to \"$HOME/.bashrc\""
     echo >> "$HOME/.bashrc"
     echo "# Added by $0" >> "$HOME/.bashrc"
-    echo ". \"$HOME/profile-san/bashrc_common\"" >> "$HOME/.bashrc"
+    echo ". \"$HOME/profile/bashrc_common\"" >> "$HOME/.bashrc"
 fi
 
 
@@ -68,13 +58,13 @@ echo
 if ! [[ -f "$HOME/.vimrc" ]]; then
     echo "Creating a \"$HOME/.vimrc\" file."
 fi
-if grep "^source $HOME/profile-san/vimrc_common\$" "$HOME/.vimrc" >&/dev/null; then
-    echo "------------------  Found \"$HOME/profile-san/vimc_common\" in \"$HOME/.vimrc\"."
+if grep "^source $HOME/profile/vimrc_common\$" "$HOME/.vimrc" >&/dev/null; then
+    echo "------------------  Found \"$HOME/profile/vimc_common\" in \"$HOME/.vimrc\"."
 else
-    echo "Appending \"source $HOME/profile-san/vimrc_common\" to \"$HOME/.vimrc\""
+    echo "Appending \"source $HOME/profile/vimrc_common\" to \"$HOME/.vimrc\""
     echo >> "$HOME/.vimrc"
     echo "\" Added by $0" >> "$HOME/.vimrc"
-    echo "source $HOME/profile-san/vimrc_common" >> "$HOME/.vimrc"
+    echo "source $HOME/profile/vimrc_common" >> "$HOME/.vimrc"
 fi
 
 echo

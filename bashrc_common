@@ -89,8 +89,8 @@ pathmunge () {
 
 # User's bin is more important than everything.
 pathmunge "$HOME/bin"
-# san'- is after everything
-pathmunge "$HOME/profile-san" after
+# profile is after everything
+pathmunge "$HOME/profile" after
 # finally the local dir
 pathmunge "." after
 
@@ -132,7 +132,7 @@ esac
 # This is my new fancy prompt command.
 # ###    This MUST happen after any other PROMPT_COMMAND things.
 if [ "$TERM" == "screen" ]; then
-	[[ -f "$HOME/profile-san/prompt_command-time" ]] && . "$HOME/profile-san/prompt_command-time"
+	[[ -f "$HOME/profile/prompt_command-time" ]] && . "$HOME/profile/prompt_command-time"
 fi
 
 # HISTORY things

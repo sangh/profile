@@ -8,7 +8,7 @@ set nocompatible	" Must be first: use Vim defaults (much better!)
 let mapleader = ","
 
 filetype off
-set runtimepath+=$HOME/profile-san/vim_dotdir
+set runtimepath+=$HOME/profile/vim_dotdir
 call pathogen#runtime_append_all_bundles()
 call pathogen#helptags()
 filetype plugin indent on
