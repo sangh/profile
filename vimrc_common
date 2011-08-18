@@ -65,12 +65,6 @@ if version > 702
 else
     set number " Line numbers.
 endif
-if version > 702
-    set colorcolumn=80
-else
-    highlight OverLength ctermbg=red ctermfg=white guibg=#592929
-    match OverLength /\%81v.\+/
-endif
 
 " Do not use modelines, would I want them?
 set modelines=0
@@ -99,6 +93,14 @@ if &t_Co > 2 || has("gui_running")
   syntax on
   set background=dark
   colorscheme delek
+endif
+
+" After the color scheme.
+if version > 702
+    set colorcolumn=80
+else
+    highlight OverLength ctermbg=red ctermfg=white guibg=#592929
+    match OverLength /\%81v.\+/
 endif
 
 if has("autocmd")
