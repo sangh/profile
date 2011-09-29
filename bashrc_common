@@ -53,7 +53,6 @@ alias cd..='cd ..'
 alias ..='cd ..'
 alias mv='mv -i'
 alias cp='cp -i'
-alias rm='rm -i'
 
 if ! grep --color >&/dev/null; then
 	alias grep="grep --color"
