@@ -141,10 +141,11 @@ export PROMPT_COMMAND=""
 # Change the window title of X terminals
 case $TERM in
 	xterm*|rxvt|Eterm|eterm)
-		export PROMPT_COMMAND='echo -ne "\e]0;${USER}@${HOSTNAME%%.*}:${PWD/$HOME/~}\007"'
+        # Must use \033 and not \e here.
+		export PROMPT_COMMAND='echo -ne "\033]0;${USER}@${HOSTNAME%%.*}:${PWD/$HOME/~}\007"'
 		;;
 	screen)
-		export PROMPT_COMMAND='echo -ne "\e_${USER}@${HOSTNAME%%.*}:${PWD/$HOME/~}\e\\"'
+		export PROMPT_COMMAND='echo -ne "\033_${USER}@${HOSTNAME%%.*}:${PWD/$HOME/~}\e\\"'
 		;;
 esac
 
