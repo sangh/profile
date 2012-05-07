@@ -7,6 +7,9 @@ set nocompatible	" Must be first: use Vim defaults (much better!)
 " Plugins may use the mapleader...
 let mapleader = ","
 
+" Try this everywhere for a bit, set 256 colors.
+set t_Co=256
+
 filetype off
 set runtimepath+=$HOME/profile/vim_dotdir
 call pathogen#runtime_append_all_bundles()
