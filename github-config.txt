@@ -4,5 +4,5 @@ HostName github.com
 User git  # Yes, git.
 IdentityFile ~/.ssh/id_rsa_gh
 
-git config user.email san.gh@host
-git config user.name "San GH"
+git config --add user.email "san.gh@github.com"
+git config --add user.name "San GH"
