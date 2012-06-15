@@ -23,3 +23,14 @@ e "Comment   \033[00;34m(Colour Example)\033[00m(Norm: Blue  ) is 255 127 80"
 
 
 e
+
+
+x=80
+e "Next line is $x '-' chars and then a newline:"
+while [[ 0 < "$x" ]]; do
+    x=$((x-1))
+    e -n -
+done
+e
+
+
