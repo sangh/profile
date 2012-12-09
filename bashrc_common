@@ -130,7 +130,9 @@ function PS1GitBranchDirty {
         return 0
     fi
     echo -n "[$br"
-    if [[ $(git status 2> /dev/null | tail -n1) != 'nothing to commit (working directory clean)' ]]; then
+    lastGitStatusLine=$(git status 2> /dev/null | tail -n1)
+    if [[ "$lastGitStatusLine" != 'nothing to commit (working directory clean)' 
+        && "$lastGitStatusLine" != 'nothing to commit, working directory clean' ]]; then
         echo -n '*'
     fi
     echo "]"
