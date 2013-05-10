@@ -1,0 +1,39 @@
+#!/usr/bin/python
+
+help = """
+This script will print to stdout the union, intersection, or difference of two
+files, taking each line as an element.  Because these are sets duplicates are
+removed so union is not the same as just cat~ing the files together.
+
+Must have three arguments.  The first argument must be one of  'u', 'union',
+'i', 'intersection', 'd', or 'difference'.  The second and third arguments must
+be readable files.  The result is printed on stdout, or an error is printed on
+stderr, and the return value is not zero.
+"""
+
+import os, sys
+
+def get_set_from_file(fn):
+    f = open(fn, "r")
+    s = set([i[:-1] for i in f.readlines()])
+    f.close()
+    return s
+
+op = sys.argv[1]
+A = get_set_from_file(sys.argv[2])
+B = get_set_from_file(sys.argv[3])
+
+if op in ['u', 'union']:
+    sop = A.union
+elif op in ['i', 'intersection']:
+    sop = A.intersection
+elif op in ['d', 'difference']:
+    sop = A.difference
+else:
+    print >> sys.stderr, "Unknown operation: " + c
+    sys.exit(1)
+
+res = list(sop(B))
+res.sort()
+for line in res:
+    print line
