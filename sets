@@ -30,7 +30,7 @@ elif op in ['i', 'intersection']:
 elif op in ['d', 'difference']:
     sop = A.difference
 else:
-    print >> sys.stderr, "Unknown operation: " + c
+    print >> sys.stderr, "Unknown operation: " + op
     sys.exit(1)
 
 res = list(sop(B))
