@@ -60,15 +60,6 @@ fi
 alias g='grep -iE'
 alias gr='grep -rinsEH'
 
-
-if ! less -r >&/dev/null; then
-	alias less="less -r"
-fi
-
-# Taking this out because you have to connect to the internet to get success.
-#if ! whois -H >&/dev/null; then
-	#alias whois="whois -H"
-#fi
 alias ps='COLUMNS=400 ps'
 alias p='ps -elf'
 if cal -3 >&/dev/null; then
