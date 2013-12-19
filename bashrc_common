@@ -9,7 +9,7 @@ umask 0002
 
 
 # If this shell is not interactive, do nothing below this.
-if [ -z "$PS1" ]; then
+if [[ $- != *i* ]]; then
     # This shell is not interactive.
     return
 fi
@@ -46,6 +46,7 @@ elif which vi >& /dev/null; then
 	export EDITOR VISUAL
 	alias v='vi'
 fi
+export LESS=FRX
 alias c='cd'
 alias cd~='cd ~'
 alias cd-='cd -'
@@ -53,6 +54,7 @@ alias cd..='cd ..'
 alias ..='cd ..'
 alias mv='mv -i'
 alias cp='cp -i'
+alias xa='xargs -I \{\} -n 1 -P 50'
 
 if ! grep --color >&/dev/null; then
 	alias grep="grep --color"
@@ -152,6 +154,8 @@ esac
 # HISTORY things
 shopt -s histappend
 export HISTIGNORE="&:[ ]*:bg:fg:exit"
+export HISTFILESIZE=999999
+export HISTSIZE=999999
 
 # When do you _not_ want extended globbing?
 shopt -s extglob
