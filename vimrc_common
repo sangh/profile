@@ -7,9 +7,6 @@ set nocompatible	" Must be first: use Vim defaults (much better!)
 " Plugins may use the mapleader...
 let mapleader = ","
 
-" Try this everywhere for a bit, set 256 colors.
-set t_Co=256
-
 filetype off
 set runtimepath+=$HOME/profile/vim_dotdir
 call pathogen#infect()
@@ -91,12 +88,17 @@ set wrapscan
 
 " Switch syntax highlighting on, when the terminal has colors
 " Also switch on highlighting the last used search pattern.
-if &t_Co > 2 || has("gui_running")
-  syntax on
-  set background=dark
-  colorscheme delek
+syntax enable
+set t_Co=256
+set background=dark
+colorscheme solarized
+if &term=="xterm"
+     set t_Co=8
+     set t_Sb=^[4%dm
+     set t_Sf=^[3%dm
+"elseif &term=="cygwin"
+	"syntax off
 endif
-
 " After the color scheme.
 if version > 702
     set colorcolumn=80
@@ -156,19 +158,6 @@ execute 'set dictionary+=' . PersonalDict
 set dictionary+=/usr/dict/words
 set complete=.,w,k
 set infercase
-
-
-
-if &term=="xterm"
-     set t_Co=8
-     set t_Sb=^[4%dm
-     set t_Sf=^[3%dm
-endif
-"if &term=="cygwin"
-	"syntax off
-"endif
-
-
 
 
 " These should be all the remappings
