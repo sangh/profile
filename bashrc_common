@@ -163,3 +163,7 @@ shopt -s extglob
 
 # Aliases to do the recursive svn add/remove.
 alias svn-addremove="svn st | grep '^\?' | awk '{print \$2}' | xargs svn add && svn st | grep '^\!' | awk '{print \$2}' | xargs svn rm"
+
+# Less is broken: http://seclists.org/fulldisclosure/2014/Nov/74
+unset LESSOPEN
+unset LESSCLOSE
