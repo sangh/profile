@@ -90,6 +90,8 @@ export PATH
 
 # This let's you have small typos in the "cd" cmd.
 shopt -s cdspell
+# Check the window size after every command.
+shopt -s checkwinsize
 
 # enable bash completion in interactive shells
 if [ -f /etc/bash_completion -a -z "$BASH_COMPLETION" ]; then
