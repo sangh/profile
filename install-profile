@@ -67,6 +67,67 @@ else
     echo "source $HOME/profile/vimrc_common" >> "$HOME/.vimrc"
 fi
 
+
+echo
+
+
+if [[ -d "$HOME/bin" ]]; then
+    echo "------------------  Found \"$HOME/bin\"."
+else
+    echo "Creating \"$HOME/bin\"."
+    mkdir "$HOME/bin"
+fi
+
+echo
+
+if [[ -d "$HOME/bin/src" ]]; then
+    echo "------------------  Found \"$HOME/bin/src\"."
+else
+    echo "Creating \"$HOME/bin/src\"."
+    mkdir "$HOME/bin/src"
+fi
+
+
+echo
+
+
+
+PROG="icdiff"
+GH_PROG_URL='https://github.com/jeffkaufman/icdiff'
+
+if [[ -e "$HOME/bin/$PROG" ]]; then
+    echo "------------------  Found \"$HOME/bin/$PROG\"."
+else
+    echo "Calling \"git clone $GH_PROG_URL\"."
+    pushd "$HOME/bin/src"
+    git clone $GH_PROG_URL
+    cd ..
+    ln -s "src/$PROG"
+    popd
+fi
+
+
+echo
+
+
+PROG="cv"
+GH_PROG_URL='https://github.com/Xfennec/cv'
+
+if [[ -e "$HOME/bin/$PROG" ]]; then
+    echo "------------------  Found \"$HOME/bin/$PROG\"."
+else
+    echo "Calling \"git clone $GH_PROG_URL\"."
+    pushd "$HOME/bin/src"
+    git clone $GH_PROG_URL
+    cd ..
+    ln -s "src/$PROG"
+    popd
+fi
+
+
+echo
+
+
 echo
 echo "------------------  Done."
 echo
