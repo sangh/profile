@@ -102,7 +102,7 @@ else
     pushd "$HOME/bin/src"
     git clone $GH_PROG_URL
     cd ..
-    ln -s "src/$PROG"
+    ln -s "src/$PROG/$PROG"
     popd
 fi
 
@@ -119,8 +119,11 @@ else
     echo "Calling \"git clone $GH_PROG_URL\"."
     pushd "$HOME/bin/src"
     git clone $GH_PROG_URL
+    cd "$PROG"
+    make
     cd ..
-    ln -s "src/$PROG"
+    cd ..
+    ln -s "src/$PROG/$PROG"
     popd
 fi
 
