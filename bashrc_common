@@ -177,6 +177,7 @@ unset LESSCLOSE
 # are more than one match, print an error), and if none, then check the
 # sub-directories for it, then continue with the rest of the arguments.
 # If no matches are found, try again from $HOME.
+# Will always follow symlinks.
 
 alias ..='cd ..'
 c_error_str=""
@@ -192,7 +193,7 @@ c_glob_one_level_deep() {
             c_error_str="Multiple matches found for \"$2\" in \"$1\"."
             return
         fi
-    done < <(find "$1" -maxdepth 1 -iname '*'"$2"'*' -and -type d -print0)
+    done < <(find -L "$1" -maxdepth 1 -iname '*'"$2"'*' -and -type d -print0)
 }
 c() {
     if [[ $# -eq 0 ]]; then
