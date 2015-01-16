@@ -90,6 +90,19 @@ if [ -f /etc/bash_completion -a -z "$BASH_COMPLETION" ]; then
     . /etc/bash_completion
 fi
 
+# Clear the PROMPT_COMMAND, done before PS1.
+export PROMPT_COMMAND='ret=$?;'
+# Change the window title of X terminals
+case $TERM in
+	xterm*|rxvt|Eterm|eterm)
+        # Must use \033 and not \e here.
+		export PROMPT_COMMAND="$PROMPT_COMMAND"'echo -ne "\033]0;${USER}@${HOSTNAME%%.*}:${PWD/$HOME/~}\007"'
+		;;
+	screen)
+		export PROMPT_COMMAND="$PROMPT_COMMAND"'echo -ne "\033_${USER}@${HOSTNAME%%.*}:${PWD/$HOME/~}\e\\"'
+		;;
+esac
+
 # Set the fancy prompt, start by removing what was there.
 # And move the cursor to the start: http://jonisalonen.com/2012/your-bash-prompt-needs-this/
 PS1="\[\e[00;00m\]\[\e[G\]"
@@ -100,14 +113,13 @@ fi
 PS1="${PS1}${debian_chroot:+($debian_chroot)}"
 # Add the return code and time.
 function returnCodeColor {
-    ret=$1
-    if [[ $ret -eq 0 ]]; then
-        echo "$ret"
+    if [[ $1 -eq 0 ]]; then
+        echo "00m"
     else
-        echo -e "\e[00;41m$ret\e[00m"
+        echo "41m"
     fi
 }
-PS1="${PS1}"'$(returnCodeColor $?) \[\e[00;33m\]\D{%H:%M}\[\e[00m\] '
+PS1="${PS1}"'\[\e[00;$(returnCodeColor $ret)\]${ret}\[\e[00;00m\] \[\e[00;33m\]\D{%H:%M}\[\e[00m\] '
 # Add (user and) host.
 if [[ "root" == "$USER" ]]; then
     PS1="$PS1"'\[\e[01;31m\]\h '
@@ -133,19 +145,6 @@ function PS1GitBranchDirty {
     echo "]"
 } 
 export PS1="$PS1"'$(PS1GitBranchDirty)\$\[\e[00m\] '
-
-# Clear the PROMPT_COMMAND
-export PROMPT_COMMAND=""
-# Change the window title of X terminals
-case $TERM in
-	xterm*|rxvt|Eterm|eterm)
-        # Must use \033 and not \e here.
-		export PROMPT_COMMAND='echo -ne "\033]0;${USER}@${HOSTNAME%%.*}:${PWD/$HOME/~}\007"'
-		;;
-	screen)
-		export PROMPT_COMMAND='echo -ne "\033_${USER}@${HOSTNAME%%.*}:${PWD/$HOME/~}\e\\"'
-		;;
-esac
 
 # HISTORY things
 shopt -s histappend
