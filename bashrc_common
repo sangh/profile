@@ -203,7 +203,12 @@ c() {
         if [[ -d "$1" ]]; then
             cd "$1"
             return
+        elif [[ -d "${HOME}/$1" ]]; then  # In case '.' is not in the path
+            echo "${HOME}/$1"
+            cd "${HOME}/$1"
+            return
         elif [[ "-" == "$1" ]]; then
+            echo "$OLDPWD"
             cd "$OLDPWD"
             return
         fi
