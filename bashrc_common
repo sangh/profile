@@ -99,7 +99,15 @@ if [ -z "$debian_chroot" ] && [ -r /etc/debian_chroot ]; then
 fi
 PS1="${PS1}${debian_chroot:+($debian_chroot)}"
 # Add the return code and time.
-PS1="$PS1"'$? \[\e[00;33m\]\D{%H:%M} '
+function returnCodeColor {
+    ret=$1
+    if [[ $ret -eq 0 ]]; then
+        echo "$ret"
+    else
+        echo -e "\e[00;41m$ret\e[00m"
+    fi
+}
+PS1="${PS1}"'$(returnCodeColor $?) \[\e[00;33m\]\D{%H:%M}\[\e[00m\] '
 # Add (user and) host.
 if [[ "root" == "$USER" ]]; then
     PS1="$PS1"'\[\e[01;31m\]\h '
