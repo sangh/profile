@@ -97,7 +97,7 @@ PS1="\[\e[00;00m\]\[\e[G\]"
 if [ -z "$debian_chroot" ] && [ -r /etc/debian_chroot ]; then
     debian_chroot="$(cat /etc/debian_chroot) "
 fi
-PS1="${debian_chroot:+($debian_chroot)}"
+PS1="${PS1}${debian_chroot:+($debian_chroot)}"
 # Add the return code and time.
 PS1="$PS1"'$? \[\e[00;33m\]\D{%H:%M} '
 # Add (user and) host.
@@ -138,12 +138,6 @@ case $TERM in
 		export PROMPT_COMMAND='echo -ne "\033_${USER}@${HOSTNAME%%.*}:${PWD/$HOME/~}\e\\"'
 		;;
 esac
-
-# This is my new fancy prompt command.
-# ###    This MUST happen after any other PROMPT_COMMAND things.
-#if [ "$TERM" == "screen" ]; then
-	#[[ -f "$HOME/profile/prompt_command-time" ]] && . "$HOME/profile/prompt_command-time"
-#fi
 
 # HISTORY things
 shopt -s histappend
