@@ -46,12 +46,6 @@ elif which vi >& /dev/null; then
 	export EDITOR VISUAL
 	alias v='vi'
 fi
-export LESS=FRX
-alias c='cd'
-alias cd~='cd ~'
-alias cd-='cd -'
-alias cd..='cd ..'
-alias ..='cd ..'
 alias mv='mv -i'
 alias cp='cp -i'
 alias xa='xargs -I \{\} -n 1 -P 50'
@@ -88,8 +82,6 @@ pathmunge "." after
 
 export PATH
 
-# This let's you have small typos in the "cd" cmd.
-shopt -s cdspell
 # Check the window size after every command.
 shopt -s checkwinsize
 
@@ -167,5 +159,89 @@ shopt -s extglob
 alias svn-addremove="svn st | grep '^\?' | awk '{print \$2}' | xargs svn add && svn st | grep '^\!' | awk '{print \$2}' | xargs svn rm"
 
 # Less is broken: http://seclists.org/fulldisclosure/2014/Nov/74
+export LESS=FRX
 unset LESSOPEN
 unset LESSCLOSE
+
+
+# This is what I use to change directories (dirs).
+# If given no arguments (args) change dir to `$HOME`.
+# If one arg is given and it exists, change dir to it, or if the arg is `-`
+# change dir to `$OLDPWD` (the same as the regular `cd`).
+# This does not use `$CDPATH` instead it is always `$PWD:$HOME`.
+# Otherwise (the one argument doesn't exist or there is more than 1 argument
+# then if there is a '/' in any argument, print an error, if not then go
+# through each one in order and append to the path-to-change-to the directory,
+# the directory or a directory that has the argument as a sub-string (if there
+# are more than one match, print an error), and if none, then check the
+# sub-directories for it, then continue with the rest of the arguments.
+# If no matches are found, try again from $HOME.
+
+alias ..='cd ..'
+c_error_str=""
+c_found_dir=""
+c_glob_one_level_deep() {
+    c_error_str="No matches found for \"$2\" in \"$1\"."
+    c_found_dir=""
+    while IFS= read -r -d $'\0' dir; do
+        if [[ -z "$c_found_dir" ]]; then
+            c_error_str=""
+            c_found_dir=$dir
+        else
+            c_error_str="Multiple matches found for \"$2\" in \"$1\"."
+            return
+        fi
+    done < <(find "$1" -maxdepth 1 -iname '*'"$2"'*' -and -type d -print0)
+}
+c() {
+    if [[ $# -eq 0 ]]; then
+        cd "$HOME"
+        return 0
+    elif [[ $# -eq 1 ]]; then
+        if [[ -d "$1" ]]; then
+            cd "$1"
+            return
+        elif [[ "-" == "$1" ]]; then
+            cd "$OLDPWD"
+            return
+        fi
+    fi
+    chp=$PWD
+    for arg; do
+        if [[ $arg == *"/"* ]]; then
+            echo "Argument \"$arg\" contains a slash, so won't glob." >&2
+            return
+        fi
+        c_glob_one_level_deep "$chp" "$arg"
+        if [[ -z "$c_error_str" ]]; then
+            chp=$c_found_dir
+        else
+            break
+        fi
+    done
+    if [[ -z "$c_error_str" ]]; then
+        echo "$chp"
+        cd "$chp"
+        return
+    elif [[ "$PWD" != "$HOME" ]]; then
+        c_error_str_old=$c_error_str
+        chp=$HOME
+        for arg; do
+            # Don't need the '/' check as it was done above.
+            c_glob_one_level_deep "$chp" "$arg"
+            if [[ -z "$c_error_str" ]]; then
+                chp=$c_found_dir
+            else
+                break
+            fi
+        done
+        if [[ -z "$c_error_str" ]]; then
+            echo "$chp"
+            cd "$chp"
+            return
+        fi
+        echo "$c_error_str_old" >&2
+    fi
+    echo "$c_error_str" >&2
+    return 1
+}
