@@ -35,11 +35,25 @@ fi
 alias la='l -a'
 alias ll='la -l'
 alias d='du -hs `\ls -A`'
+unalias v
+unset v
 if which vim >& /dev/null; then
 	EDITOR=vim
 	VISUAL=vim
 	export EDITOR VISUAL
-	alias v='vim'
+	function v() {
+        swap="yes"
+        for arg; do
+            if [[ -e "$arg" && $(du -k "$arg"|cut -f1) -ge 1024 ]]; then
+                swap="no"
+            fi
+        done
+        if [[ "no" == "$swap" ]]; then
+            vim -n "$@"
+        else
+            vim "$@"
+        fi
+    }
 elif which vi >& /dev/null; then
 	EDITOR=vi
 	VISUAL=vi
