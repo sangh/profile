@@ -12,19 +12,9 @@ set runtimepath+=$HOME/profile/vim_dotdir
 call pathogen#infect()
 filetype plugin indent on
 
-" Default for the plugins.
-let g:EnhCommentifyTraditionalMode = 'No'
-let g:EnhCommentifyFirstLineMode = 'No'
-let g:EnhCommentifyBindInInsert = 'No'
-
-" Defaults to home dir.
-let g:yankring_history_file = '.vim_yankring_history'
-
-
-
 set bs=2		" allow backspacing over everything in insert mode
 set nobackup		" no   keep a backup file
-set noswapfile   " If need to load a large file, then turn this off...
+set swapfile   " If opening a large file, this is tunred off in `v`.
 set viminfo='20,\"50	" read/write a .viminfo file, don't store more
 			" than 50 lines of registers
 set history=50		" keep 50 lines of command line history
@@ -96,8 +86,6 @@ if &term=="xterm"
      set t_Co=8
      set t_Sb=^[4%dm
      set t_Sf=^[3%dm
-"elseif &term=="cygwin"
-	"syntax off
 endif
 " After the color scheme.
 if version > 702
@@ -119,48 +107,12 @@ if has("autocmd")
   autocmd FileType *      set formatoptions=tcql nocindent comments&
   autocmd FileType c,cpp  set formatoptions=croql cindent comments=sr:/*,mb:*,el:*/,://
  augroup END
-
- augroup gzip
-  " Remove all gzip autocommands
-  au!
-
-  " Enable editing of gzipped files
-  "	  read:	set binary mode before reading the file
-  "		uncompress text in buffer after reading
-  "	 write:	compress file after writing
-  "	append:	uncompress file, append, compress file
-  autocmd BufReadPre,FileReadPre	*.gz set bin
-  autocmd BufReadPost,FileReadPost	*.gz let ch_save = &ch|set ch=2
-  autocmd BufReadPost,FileReadPost	*.gz '[,']!gunzip
-  autocmd BufReadPost,FileReadPost	*.gz set nobin
-  autocmd BufReadPost,FileReadPost	*.gz let &ch = ch_save|unlet ch_save
-  autocmd BufReadPost,FileReadPost	*.gz execute ":doautocmd BufReadPost " . expand("%:r")
-
-  autocmd BufWritePost,FileWritePost	*.gz !mv <afile> <afile>:r
-  autocmd BufWritePost,FileWritePost	*.gz !gzip <afile>:r
-
-  autocmd FileAppendPre			*.gz !gunzip <afile>
-  autocmd FileAppendPre			*.gz !mv <afile>:r <afile>
-  autocmd FileAppendPost		*.gz !mv <afile> <afile>:r
-  autocmd FileAppendPost		*.gz !gzip <afile>:r
- augroup END
 endif
 
 " This makes search case insensitive when the pattern is all lowercase.
 set ignorecase
 set smartcase
 set gdefault  " All substitutions are global
-
-" this is for ispell, use by typing ":is"
-let IspellLang = 'english'
-let PersonalDict = '~/.ispell_' . IspellLang
-execute 'set dictionary+=' . PersonalDict
-set dictionary+=/usr/dict/words
-set complete=.,w,k
-set infercase
-
-
-" These should be all the remappings
 
 " Don't use Ex mode, use Q for formatting
 map Q gq
@@ -176,17 +128,10 @@ nnoremap \ ;
 vnoremap \ ;
 
 
-execute 'nnoremap <leader>i :w<CR>:!ispell -x -d ' . IspellLang . ' %<CR>:e<CR><CR>'
-" This is for a spell use by typing ",as", or ",ase", or ",ash"
-execute 'nnoremap <leader>as :w!<CR>:!aspell check "%"<CR>:e! "%"<CR><CR>'
-execute 'nnoremap <leader>ae :w!<CR>:!aspell -e check "%"<CR>:e! "%"<CR><CR>'
+execute 'nnoremap <leader>a :w!<CR>:!aspell check "%"<CR>:e! "%"<CR><CR>'
 execute 'nnoremap <leader>ah :w!<CR>:!aspell -H check "%"<CR>:e! "%"<CR><CR>'
-execute 'nnoremap <leader>at :w!<CR>:!aspell -t check "%"<CR>:e! "%"<CR><CR>'
-" Make
-execute 'nnoremap <leader>m :w<CR>:!make<CR>'
 " This is sdate.
 execute 'nnoremap <leader>s :r!sdate<CR>kJ$'
-
 " This is the total thing
 execute 'nnoremap <leader>t yypkI.005+(<Esc>A)<Esc>!!b<CR>0f.lllDA<Space>'
 " BC !
@@ -195,7 +140,6 @@ execute 'nnoremap <leader>b !!b<CR>'
 execute 'nnoremap <leader>u !!tr-url-escapes<CR>'
 " run addr
 execute 'nnoremap <leader>d !!addr<CR>'
-
 
 " Change to use verymagic all the time
 nnoremap / /\v
