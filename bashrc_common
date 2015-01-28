@@ -35,7 +35,7 @@ fi
 alias la='l -a'
 alias ll='la -l'
 alias d='du -hs `\ls -A`'
-unalias v
+unalias v >&/dev/null
 unset v
 if which vim >& /dev/null; then
 	EDITOR=vim
