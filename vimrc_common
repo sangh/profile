@@ -128,8 +128,9 @@ nnoremap \ ;
 vnoremap \ ;
 
 
-execute 'nnoremap <leader>a :w!<CR>:!aspell check "%"<CR>:e! "%"<CR><CR>'
-execute 'nnoremap <leader>ah :w!<CR>:!aspell -H check "%"<CR>:e! "%"<CR><CR>'
+execute 'nnoremap <leader>a :w!<CR>:!aspell --encoding=UTF-8 --mode=email check "%"<CR>:e! "%"<CR><CR>'
+execute 'nnoremap <leader>ah :w!<CR>:!aspell --encoding=UTF-8 --mode=html check "%"<CR>:e! "%"<CR><CR>'
+execute 'nnoremap <leader>at :w!<CR>:!aspell --encoding=UTF-8 --mode=tex check "%"<CR>:e! "%"<CR><CR>'
 " This is sdate.
 execute 'nnoremap <leader>s :r!sdate<CR>kJ$'
 " This is the total thing
