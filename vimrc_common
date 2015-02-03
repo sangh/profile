@@ -1,45 +1,32 @@
-" First we load all the modules.
-" Who knows what they depend on,
-" and we may want to change them later.
+set nocompatible  " Must be first: use Vim defaults (much better!)
 
-set nocompatible	" Must be first: use Vim defaults (much better!)
-
-" Plugins may use the mapleader...
+" Plugins may use the mapleader, so set first.
 let mapleader = ","
 
-filetype off
-set runtimepath+=$HOME/profile/vim_dotdir
-call pathogen#infect()
-filetype plugin indent on
-
-set bs=2		" allow backspacing over everything in insert mode
-set nobackup		" no   keep a backup file
-set swapfile   " If opening a large file, this is tunred off in `v`.
-set viminfo='20,\"50	" read/write a .viminfo file, don't store more
-			" than 50 lines of registers
-set history=50		" keep 50 lines of command line history
-set ruler		" show the cursor position all the time
-set tabstop=4		" set the tab stop, duh!
-set shiftwidth=4	" the autoindent stuff
-set softtabstop=4   " Also sts
-set expandtab		" So we get spaces.
-set shiftround " Use muliple of shiftwith with <>
-set nofoldenable " Start w/o folds, enable when a fold cmd is used.
+set bs=2  " allow backspacing over everything in insert mode
+set nobackup  " no   keep a backup file
+set swapfile  " If opening a large file, this is tunred off in `v`.
+set viminfo='20,\"50  " .viminfo, don't store more than 50 lines of registers
+set history=50  " keep 50 lines of command line history
+set ruler  " show the cursor position all the time
+set tabstop=4  " set the tab stop, duh!
+set shiftwidth=4  " the autoindent stuff
+set softtabstop=4  " Also sts
+set expandtab  " So we get spaces.
+set shiftround  " Use muliple of shiftwith with <>
+set nofoldenable  " Start w/o folds, enable when a fold cmd is used.
 set pastetoggle=<F11>
-set incsearch		"find as each lettel is typed.
-set scrolloff=5		"Keep five lines showeng around cursor.
-" Options to make long lines not wrap in the buffer, but wrap on-screen at
-" word boundries.
+set incsearch  "find as each lettel is typed.
+set scrolloff=5  "Keep five lines showeng around cursor.
+" Wrap long lines in the buffer, but wrap on-screen at word boundries.
 set textwidth=0
 set wrapmargin=0
 set lbr
 set wrap
-set showmatch " Shew matching parons
-" Showmatch
+set showmatch  " Show matching parens.
 set sm  "Jump cursor display (not the actualy cursor) to the matching paren.
 set showmode
 set encoding=utf-8
-set ai			" always set autoindenting on
 set showcmd
 set wildmenu
 set wildmode=list:longest
@@ -48,33 +35,40 @@ set cul  "Cursorline?
 set ttyfast
 set backspace=indent,eol,start
 set laststatus=1  " Only show status if > 2 windows.
-if version > 702
-    set undodir=$HOME/.vimundordir
-    set undofile
-else
+if version <= 702
     set number " Line numbers.
 endif
+set nrformats-=octal  " Don't treat 0 prefixed numbers as octal with ^A
+set ttimeout
+set ttimeoutlen=100
+set display+=lastline
+if &listchars ==# 'eol:$'
+    set listchars=tab:>\ ,trail:-,extends:>,precedes:<,nbsp:+
+endif
+if v:version > 703 || v:version == 703 && has("patch541")
+    set formatoptions+=j  " Del comment char when joining lines.
+endif
+set autoread
+set fileformats+=mac
 
 " Do not use modelines, would I want them?
 set modelines=0
 
-set hidden "Save the buffer, like when useing :e
-
+set hidden  "Save the buffer, like when useing :e
 
 " Only do this part when compiled with support for autocommands
 if has("autocmd")
-  " In text files, always limit the width of text to 78 characters
-  " I don't want this. autocmd BufRead *.txt set tw=78
-  " When editing a file, always jump to the last cursor position
-  autocmd BufReadPost * if line("'\"") | exe "'\"" | endif
+    " In text files, always limit the width of text to 78 characters
+    " I don't want this. autocmd BufRead *.txt set tw=78
+    " When editing a file, always jump to the last cursor position
+    autocmd BufReadPost * if line("'\"") | exe "'\"" | endif
+    filetype plugin indent on
 endif
 
-set cindent
+set ai  " always set autoindenting on
 
-" Highlight all searches.
 set hlsearch
-" Always wrap around.
-set wrapscan
+set wrapscan  " Always wrap around.
 
 " Switch syntax highlighting on, when the terminal has colors
 " Also switch on highlighting the last used search pattern.
@@ -95,18 +89,20 @@ else
     match OverLength /\%81v.\+/
 endif
 
-if has("autocmd")
- augroup cprog
-  " Remove all cprog autocommands
-  au!
+set cindent
 
-  " When starting to edit a file:
-  "   For C and C++ files set formatting of comments and set C-indenting on.
-  "   For other files switch it off.
-  "   Don't change the order, it's important that the line with * comes first.
-  autocmd FileType *      set formatoptions=tcql nocindent comments&
-  autocmd FileType c,cpp  set formatoptions=croql cindent comments=sr:/*,mb:*,el:*/,://
- augroup END
+if has("autocmd")
+    augroup cprog
+        " Remove all cprog autocommands
+        au!
+
+        " When starting to edit a file:
+        "   For C and C++ files set formatting of comments and set C-indenting on.
+        "   For other files switch it off.
+        "   Don't change the order, it's important that the line with * comes first.
+        autocmd FileType *      set formatoptions=tcql nocindent comments&
+        autocmd FileType c,cpp  set formatoptions=croql cindent comments=sr:/*,mb:*,el:*/,://
+    augroup END
 endif
 
 " This makes search case insensitive when the pattern is all lowercase.
