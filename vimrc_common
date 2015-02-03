@@ -3,6 +3,10 @@ set nocompatible  " Must be first: use Vim defaults (much better!)
 " Plugins may use the mapleader, so set first.
 let mapleader = ","
 
+call plug#begin('~/.vim/plugged')
+Plug 'altercation/vim-colors-solarized'
+call plug#end()
+
 set bs=2  " allow backspacing over everything in insert mode
 set nobackup  " no   keep a backup file
 set swapfile  " If opening a large file, this is tunred off in `v`.
