@@ -113,7 +113,7 @@ echo
 PROG="cv"
 GH_PROG_URL='https://github.com/Xfennec/cv'
 
-if [[ -e "$HOME/bin/$PROG" ]]; then
+if [[ -e "$HOME/bin/$PROG" || -L "$HOME/bin/$PROG" ]]; then
     echo "------------------  Found \"$HOME/bin/$PROG\"."
 else
     echo "Calling \"git clone $GH_PROG_URL\"."
