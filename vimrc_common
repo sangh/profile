@@ -3,8 +3,24 @@ set nocompatible  " Must be first: use Vim defaults (much better!)
 " Plugins may use the mapleader, so set first.
 let mapleader = ","
 
+" Should occaianly call `:PlugUpdate` from vim.
 call plug#begin('~/.vim/plugged')
 Plug 'altercation/vim-colors-solarized'
+Plug 'tpope/vim-repeat'
+Plug 'tpope/vim-surround'
+Plug 'tpope/vim-commentary'
+Plug 'jpalardy/vim-slime'
+if version <= 702
+    set number " Line numbers.
+else
+    Plug 'myusuf3/numbers.vim'
+endif
+Plug 'rstacruz/sparkup'
+Plug 'gregsexton/MatchTag'
+Plug 'mhinz/vim-signify'
+Plug 'tmhedberg/matchit'
+Plug 'amdt/vim-niji'
+
 call plug#end()
 
 set bs=2  " allow backspacing over everything in insert mode
@@ -39,9 +55,6 @@ set cul  "Cursorline?
 set ttyfast
 set backspace=indent,eol,start
 set laststatus=1  " Only show status if > 2 windows.
-if version <= 702
-    set number " Line numbers.
-endif
 set nrformats-=octal  " Don't treat 0 prefixed numbers as octal with ^A
 set ttimeout
 set ttimeoutlen=100
