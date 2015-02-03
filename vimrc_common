@@ -79,7 +79,11 @@ set wrapscan  " Always wrap around.
 syntax enable
 set t_Co=256
 set background=dark
-colorscheme solarized
+try
+    colorscheme solarized
+catch /^Vim\%((\a\+)\)\=:E185/
+    " Do nothing.
+endtry
 if &term=="xterm"
      set t_Co=8
      set t_Sb=^[4%dm
