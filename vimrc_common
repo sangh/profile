@@ -22,7 +22,7 @@ Plug 'rstacruz/sparkup'
 Plug 'gregsexton/MatchTag'
 Plug 'mhinz/vim-signify'
 Plug 'tmhedberg/matchit'
-
+Plug 'bling/vim-airline'
 call plug#end()
 
 set bs=2  " allow backspacing over everything in insert mode
