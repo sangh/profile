@@ -10,8 +10,8 @@ Plug 'tpope/vim-repeat'
 Plug 'tpope/vim-surround'
 Plug 'tpope/vim-commentary'
 Plug 'tpope/vim-speeddating'
-" sdate
-autocmd VimEnter * if exists(":SpeedDatingFormat") | SpeedDatingFormat %d%b%y | endif
+autocmd VimEnter * if exists(":SpeedDatingFormat") |
+    \ SpeedDatingFormat %d%b%y | endif  " sdate
 Plug 'jpalardy/vim-slime'
 if version <= 702
     set number " Line numbers.
@@ -23,6 +23,22 @@ Plug 'gregsexton/MatchTag'
 Plug 'mhinz/vim-signify'
 Plug 'tmhedberg/matchit'
 Plug 'bling/vim-airline'
+Plug 'bling/vim-bufferline'
+Plug 'haya14busa/incsearch.vim'
+autocmd VimEnter * if exists(":IncSearchMap") |
+    \ let g:incsearch#magic = '\v' |
+    \ map / <Plug>(incsearch-forward) |
+    \ map ? <Plug>(incsearch-backward) |
+    \ map g/ <Plug>(incsearch-stay) |
+    \ set hlsearch |
+    \ let g:incsearch#auto_nohlsearch = 1 |
+    \ map n <Plug>(incsearch-nohl-n) |
+    \ map N <Plug>(incsearch-nohl-N) |
+    \ map * <Plug>(incsearch-nohl-*) |
+    \ map # <Plug>(incsearch-nohl-#) |
+    \ map g* <Plug>(incsearch-nohl-g*) |
+    \ map g# <Plug>(incsearch-nohl-g#) |
+    \ endif
 call plug#end()
 
 filetype plugin indent on
@@ -42,7 +58,6 @@ set expandtab  " So we get spaces.
 set shiftround  " Use muliple of shiftwith with <>
 set nofoldenable  " Start w/o folds, enable when a fold cmd is used.
 set pastetoggle=<F11>
-set incsearch  "find as each lettel is typed.
 set scrolloff=5  "Keep five lines showeng around cursor.
 " Wrap long lines in the buffer, but wrap on-screen at word boundries.
 set textwidth=0
@@ -146,11 +161,6 @@ execute 'nnoremap <leader>b !!b<CR>'
 execute 'nnoremap <leader>u !!tr-url-escapes<CR>'
 " run addr
 execute 'nnoremap <leader>d !!addr<CR>'
-
-" Change to use verymagic all the time
-nnoremap / /\v
-vnoremap / /\v
-cnoremap %s/ %s/\v
 
 " This is totally awesome - remap jj to escape in insert mode.
 " You'll never type jj anyway, so it's great!
