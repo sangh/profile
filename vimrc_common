@@ -10,7 +10,8 @@ Plug 'tpope/vim-repeat'
 Plug 'tpope/vim-surround'
 Plug 'tpope/vim-commentary'
 Plug 'tpope/vim-speeddating'
-autocmd VimEnter * SpeedDatingFormat %d%b%y  " sdate
+" sdate
+autocmd VimEnter * if exists(":SpeedDatingFormat") | SpeedDatingFormat %d%b%y | endif
 Plug 'jpalardy/vim-slime'
 if version <= 702
     set number " Line numbers.
