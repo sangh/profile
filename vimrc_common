@@ -25,12 +25,16 @@ Plug 'tmhedberg/matchit'
 Plug 'bling/vim-airline'
 call plug#end()
 
+filetype plugin indent on
+
+" When editing a file, always jump to the last cursor position
+autocmd BufReadPost * if line("'\"") | exe "'\"" | endif
+
 set bs=2  " allow backspacing over everything in insert mode
 set nobackup  " no   keep a backup file
 set swapfile  " If opening a large file, this is tunred off in `v`.
 set viminfo='20,\"50  " .viminfo, don't store more than 50 lines of registers
 set history=50  " keep 50 lines of command line history
-set ruler  " show the cursor position all the time
 set tabstop=4  " set the tab stop, duh!
 set shiftwidth=4  " the autoindent stuff
 set softtabstop=4  " Also sts
@@ -69,25 +73,14 @@ if v:version > 703 || v:version == 703 && has("patch541")
 endif
 set autoread
 set fileformats+=mac
-
-" Do not use modelines, would I want them?
-set modelines=0
-
+set modelines=0  " Do not use modelines, from other people.
 set hidden  "Save the buffer, like when useing :e
-
-" Only do this part when compiled with support for autocommands
-if has("autocmd")
-    " In text files, always limit the width of text to 78 characters
-    " I don't want this. autocmd BufRead *.txt set tw=78
-    " When editing a file, always jump to the last cursor position
-    autocmd BufReadPost * if line("'\"") | exe "'\"" | endif
-    filetype plugin indent on
-endif
-
 set ai  " always set autoindenting on
-
 set hlsearch
 set wrapscan  " Always wrap around.
+set ignorecase  " This makes search case insensitive when the pattern is all lowercase.
+set smartcase
+set gdefault  " All substitutions are global
 
 " Switch syntax highlighting on, when the terminal has colors
 " Also switch on highlighting the last used search pattern.
@@ -114,24 +107,17 @@ endif
 
 set cindent
 
-if has("autocmd")
-    augroup cprog
-        " Remove all cprog autocommands
-        au!
+augroup cprog
+    " Remove all cprog autocommands
+    au!
 
-        " When starting to edit a file:
-        "   For C and C++ files set formatting of comments and set C-indenting on.
-        "   For other files switch it off.
-        "   Don't change the order, it's important that the line with * comes first.
-        autocmd FileType *      set formatoptions=tcql nocindent comments&
-        autocmd FileType c,cpp  set formatoptions=croql cindent comments=sr:/*,mb:*,el:*/,://
-    augroup END
-endif
-
-" This makes search case insensitive when the pattern is all lowercase.
-set ignorecase
-set smartcase
-set gdefault  " All substitutions are global
+    " When starting to edit a file:
+    "   For C and C++ files set formatting of comments and set C-indenting on.
+    "   For other files switch it off.
+    "   Don't change the order, it's important that the line with * comes first.
+    autocmd FileType *      set formatoptions=tcql nocindent comments&
+    autocmd FileType c,cpp  set formatoptions=croql cindent comments=sr:/*,mb:*,el:*/,://
+augroup END
 
 " Don't use Ex mode, use Q for formatting
 map Q gq
@@ -169,4 +155,3 @@ cnoremap %s/ %s/\v
 " This is totally awesome - remap jj to escape in insert mode.
 " You'll never type jj anyway, so it's great!
 inoremap jj <Esc>
-
