@@ -24,6 +24,8 @@ Plug 'mhinz/vim-signify'
 Plug 'tmhedberg/matchit'
 Plug 'bling/vim-airline'
 let g:airline_powerline_fonts = 1
+let g:airline_left_sep='›' " Slightly fancier than '>'
+let g:airline_right_sep='‹' " Slightly fancier than '<'
 set laststatus=2  " Always show.
 Plug 'bling/vim-bufferline'
 if v:version < 704
@@ -95,6 +97,10 @@ set fileformats+=mac
 set modelines=0  " Do not use modelines, from other people.
 set hidden  "Save the buffer, like when useing :e
 set ai  " always set autoindenting on
+
+" Visual shifting (does not exit Visual mode), donno about this.
+vnoremap < <gv
+vnoremap > >gv
 
 " Sometimes detected as Modula-2, which I'll never use.
 autocmd BufNewFile,BufReadPost *.md set filetype=markdown
