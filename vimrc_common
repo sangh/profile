@@ -23,6 +23,8 @@ Plug 'gregsexton/MatchTag'
 Plug 'mhinz/vim-signify'
 Plug 'tmhedberg/matchit'
 Plug 'bling/vim-airline'
+autocmd VimEnter * if exists("g:airline_powerline_fonts") |
+    \ let g:airline_powerline_fonts = 1 | endif
 Plug 'bling/vim-bufferline'
 if v:version < 704
     nnoremap / /\v
