@@ -95,6 +95,8 @@ set modelines=0  " Do not use modelines, from other people.
 set hidden  "Save the buffer, like when useing :e
 set ai  " always set autoindenting on
 
+" Sometimes detected as Modula-2, which I'll never use.
+autocmd BufNewFile,BufReadPost *.md set filetype=markdown
 " Switch syntax highlighting on, when the terminal has colors
 syntax enable
 set t_Co=256
