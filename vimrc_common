@@ -32,6 +32,7 @@ autocmd VimEnter * if exists(":IncSearchMap") |
     \ let g:incsearch#auto_nohlsearch = 1 |
     \ let g:incsearch#magic = '\v' |
     \ endif
+cnoremap %s/ %s/\v  " IncSearch doesn't do this.
 call plug#end()
 
 filetype plugin indent on
