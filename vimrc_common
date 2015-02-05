@@ -26,18 +26,11 @@ Plug 'bling/vim-airline'
 Plug 'bling/vim-bufferline'
 Plug 'haya14busa/incsearch.vim'
 autocmd VimEnter * if exists(":IncSearchMap") |
-    \ let g:incsearch#magic = '\v' |
-    \ map / <Plug>(incsearch-forward) |
-    \ map ? <Plug>(incsearch-backward) |
-    \ map g/ <Plug>(incsearch-stay) |
-    \ set hlsearch |
+    \ map / <Plug>(incsearch-forward)|
+    \ map ? <Plug>(incsearch-backward)|
+    \ map g/ <Plug>(incsearch-stay)|
     \ let g:incsearch#auto_nohlsearch = 1 |
-    \ map n <Plug>(incsearch-nohl-n) |
-    \ map N <Plug>(incsearch-nohl-N) |
-    \ map * <Plug>(incsearch-nohl-*) |
-    \ map # <Plug>(incsearch-nohl-#) |
-    \ map g* <Plug>(incsearch-nohl-g*) |
-    \ map g# <Plug>(incsearch-nohl-g#) |
+    \ let g:incsearch#magic = '\v' |
     \ endif
 call plug#end()
 
