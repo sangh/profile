@@ -64,8 +64,7 @@ set textwidth=0
 set wrapmargin=0
 set lbr
 set wrap
-set showmatch  " Show matching parens.
-set sm  "Jump cursor display (not the actualy cursor) to the matching paren.
+set showmatch  " Briefly jump to the matching paren when one is inserted.
 set showmode
 set encoding=utf-8
 set showcmd
