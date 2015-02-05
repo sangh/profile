@@ -76,7 +76,7 @@ set showcmd
 set wildmenu
 set wildmode=list:longest
 set visualbell
-set cul  "Cursorline?
+set cursorline
 set ttyfast
 set backspace=indent,eol,start
 set laststatus=1  " Only show status if > 2 windows.
