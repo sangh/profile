@@ -13,11 +13,10 @@ Plug 'tpope/vim-speeddating'
 autocmd VimEnter * if exists(":SpeedDatingFormat") |
     \ SpeedDatingFormat %d%b%y | endif  " sdate
 Plug 'jpalardy/vim-slime'
-if v:version <= 702
-    set number " Line numbers.
-else
+if v:version > 702
     Plug 'myusuf3/numbers.vim'
 endif
+set number " Line numbers, need even if `myusuf3/numbers.vim` isn't there.
 Plug 'rstacruz/sparkup'
 Plug 'gregsexton/MatchTag'
 Plug 'mhinz/vim-signify'
