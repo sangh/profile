@@ -40,7 +40,8 @@ else
         \ let g:incsearch#magic = '\v' |
         \ endif
 endif
-cnoremap %s/ %s/\v  " IncSearch doesn't do this.
+" IncSearch doesn't do this, and can't be on the same line.
+cnoremap %s/ %s/\v
 set hlsearch
 set wrapscan  " Always wrap around.
 set ignorecase  " This makes search case insensitive when the pattern is all lowercase.
