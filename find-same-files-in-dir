@@ -1,0 +1,181 @@
+#!/usr/bin/python
+
+
+help_msg = """
+This program will go through the given directory (the only argument) and list
+any files within it have the same md5sum (and size).  This is
+ideal for say, a directory full of pictures and you want to remove any
+duplicates, but one file may be called several things in different directories.
+"""
+
+import sys
+import os
+import stat
+try:
+	import hashlib
+	md5func = hashlib.md5
+except ImportError:
+	print >> sys.stderr, "\nUsing old Crypto.Hash, please upgrade to hashlib.\n"
+	import Crypto.Hash.MD5
+	md5func = Crypto.Hash.MD5.new
+
+
+if len(sys.argv) != 2:
+	print >> sys.stderr, "\nThis function takes 1 argument, %d given."%(len(sys.argv) - 1)
+	print >> sys.stderr, help_msg
+	sys.exit(1)
+
+
+# List of regular files
+files = []
+
+#List of directories
+dirs = []
+
+# List if dirs with at least one non-reg file.
+strangedirs = []
+
+
+def getfiles(dir):
+	global files
+	global dirs
+	global strangedirs
+	newdirs = []
+	dirlist = os.listdir(dir)
+	dirs.append([dir, 0])
+	if len(dirlist) > 0:
+		for f in dirlist:
+			f = os.path.join(dir, f)
+			st = os.lstat(f)
+			if stat.S_ISDIR(st.st_mode):
+				newdirs.append(f)
+			elif stat.S_ISREG(st.st_mode):
+				files.append([f, st.st_size, ""])
+				dirs[-1][1] = 1 + dirs[-1][1]
+			else:
+				if not dir in strangedirs:
+					strangedirs.append(dir)
+				print "\nNot a regular file or directory:", f
+	else:
+		print "\nDirectory is empty:", dir
+	for f in newdirs:
+		getfiles(f)
+
+
+
+
+
+# Recurcivly get files.
+getfiles(sys.argv[1])
+
+if len(files) == 0:
+	print >> sys.stderr, "\nNo files found!"
+	sys.exit(2)
+
+def get_size(f):
+	return f[1]
+files.sort(key=get_size)
+dirs.sort(key=get_size)
+
+def get_md5(f):
+	h=md5func()
+	f=open(f, "r")
+	while True:
+			r=f.read(1024)
+			if not r: break
+			h.update(r)
+	f.close()
+	return(h.hexdigest())
+
+# We are gauranteed that files is at least one elem big.
+oldsz = files[0][1]
+for f in range(len(files))[1:]:
+	if oldsz == files[f][1]:
+		files[f-1][2] = get_md5(files[f-1][0])
+		files[f][2] = get_md5(files[f][0])
+	oldsz = files[f][1]
+# files should now have three elem, and be sorted by size.
+
+def ck_disp_dirs(samedirs):
+	global strangedirs
+	if len(samedirs) > 1:
+		print "\nDirs that appear the same ignoring non-reg files (denoted with a (*)) are:"
+		for f in samedirs:
+			if f in strangedirs:
+				print "(*) %s/"%(f)
+			else:
+				print "    %s/"%(f)
+		print ""
+
+def get_sz_and_h_in_dir(dir):
+	global files
+	l = []
+	for f in files:
+		if f[0][:len(dir)] == dir:
+			l.append([ f[1], f[2] ])
+	return(l)
+
+# dirs has to be at leant one (the given arg).
+oldsz = dirs[0][1]
+olddirf = get_sz_and_h_in_dir(dirs[0][0])
+samedirs = [ dirs[0][0] ]
+for f in range(len(dirs))[1:]:
+
+	#print oldsz, dirs[f][1]
+
+	if oldsz == dirs[f][1]:
+		dirf = get_sz_and_h_in_dir(dirs[f][0])
+
+		#print "1: %s"%(dirs[f][0])
+		#print "2: %s"%(dirs[f-1][0])
+		#print "______olddirf______"
+		#print olddirf
+		#print "______dirf______"
+		#print dirf
+
+		if dirf == olddirf:
+			samedirs.append(dirs[f][0])
+			continue
+	ck_disp_dirs(samedirs)
+	oldsz = dirs[f][1]
+	olddirf = get_sz_and_h_in_dir(dirs[f][0])
+	samedirs = [ dirs[f][0] ]
+ck_disp_dirs(samedirs)
+
+
+def ck_disp_same_fl(samefl):
+	if len(samefl) > 1:
+		print "\nThe following files have the same size and md5 sum:"
+		for f in samefl:
+			print "   ", f
+		print ""
+
+# Now go through, after the dirs, and compare files.
+oldsz = files[0][1]
+oldh = files[0][2]
+samefl = [ files[0][0] ]
+for f in range(len(files))[1:]:
+	if oldsz == files[f][1] and oldh == files[f][2]:
+		samefl.append(files[f][0])
+	else:
+		ck_disp_same_fl(samefl)
+		oldsz = files[f][1]
+		oldh = files[f][2]
+		samefl = [ files[f][0] ]
+ck_disp_same_fl(samefl)
+
+
+
+if False:
+#if True:
+	print "\nFiles:"
+	for f in files:
+		print f
+
+	print "\nDirs:"
+	for f in dirs:
+		print f
+
+	print "\nStrangedirs (dirs w/non-regular-files):"
+	for f in strangedirs:
+		print f
