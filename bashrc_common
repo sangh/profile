@@ -134,8 +134,8 @@ function returnCodeColor {
     fi
 }
 PS1="${PS1}"'\[\e[00;$(returnCodeColor $ret)\]${ret}\[\e[00;00m\] \[\e[00;33m\]\D{%H:%M}\[\e[00m\] '
-# Add (user and) host.
-if [[ "root" == "$USER" ]]; then
+# Add (user and) host, but not for root.
+if [[ $EUID -eq 0 ]]; then
     PS1="$PS1"'\[\e[01;31m\]\h '
 else
     PS1="$PS1"'\[\e[01;32m\]\u@\h\[\e[00m\]:'
