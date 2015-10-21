@@ -144,6 +144,9 @@ fi
 PS1="$PS1"'\[\e[01;34m\]\W\[\e[00;34m\]'
 # Git branch and dirty.
 function PS1GitBranchDirty {
+    if [[ $PWD == *".throw-away"* ]]; then
+        echo -n "[Throw Away Directory]"
+    fi
     local br
     br=$(git branch --no-color 2> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/\1/')
     if [[ -z "$br" ]]; then
@@ -157,7 +160,7 @@ function PS1GitBranchDirty {
         echo -n '*'
     fi
     echo "]"
-} 
+}
 export PS1="$PS1"'$(PS1GitBranchDirty)\$\[\e[00m\] '
 
 # HISTORY things
@@ -274,3 +277,19 @@ dmesg_with_human_timestamps () {
         }'
 }
 alias dmesg=dmesg_with_human_timestamps
+
+# Func to create a `tad` (throw away directory).  Call this, it will spawn a
+# new shell in the newly-created dir, and then when you exit the shell the
+# directory is deleted with everything inside of it.
+# PS1 also includes an indication of this.
+tad() {
+    local d="$HOME/.throw-away"
+    if [[ -e "$d" ]]; then
+        echo "Throw away directory already exists: $d" >&2
+    else
+        mkdir $d
+        (cd $d; bash)
+        echo "Exiting a TAD: rm -r $d"
+        rm -r $d
+    fi
+}
