@@ -1,13 +1,14 @@
 #!/usr/bin/python
 
-help = """This script will print to stdout the union, intersection, or difference of two
-files, taking each line as an element.  Because these are sets duplicates are
-removed so union is not the same as just cat~ing the files together.
+help = """This script will print to stdout the union, intersection, or
+difference of two files taking each file as a set with lines within the file as
+elements.  (Duplicate lines are, of course, removed so this isn't the same as
+cat~ing them.)
 
 Must have three arguments.  The first argument must be one of  'u', 'union',
 'i', 'intersection', 'd', or 'difference'.  The second and third arguments must
 be readable files.  The result is printed on stdout, or an error is printed on
-stderr, and the return value is not zero."""
+stderr, and the return value is non-zero."""
 
 import os, sys, traceback
 
