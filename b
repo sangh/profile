@@ -15,5 +15,5 @@ fi
 if [ -z "$*" ]; then
 	$bc
 else
-    echo "$(echo ""$@"" | $bc | tr -d '\n')" "=" "$*"
+    echo "$(echo "$@" | $bc | tr -d '\n')" "=" "$*"
 fi
