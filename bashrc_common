@@ -1,12 +1,9 @@
 #!/bin/bash
 
-
-
 # Umask that lets the group have permissions to default files.
+# Might have to put this in the regular `.bashrc` b/c this is sourced after
+# the interactive check in that file, if it has one.
 umask 0002
-
-
-
 
 # If this shell is not interactive, do nothing below this.
 if [[ $- != *i* ]]; then
@@ -14,10 +11,6 @@ if [[ $- != *i* ]]; then
     return
 fi
 
-
-
-
-[ -f "$HOME/.motd" ] && cat "$HOME/.motd"
 
 # Enable colors for ls, etc.  Prefer $HOME/.dir_colors #64489
 if [[ -f ~/.dir_colors ]]; then
@@ -37,24 +30,20 @@ alias ll='la -l'
 alias d='du -hs `\ls -A`'
 unalias v >&/dev/null
 unset v
-if which vim >& /dev/null; then
+if type -t vim >& /dev/null; then
 	EDITOR=vim
 	VISUAL=vim
 	export EDITOR VISUAL
 	function v() {
-        swap="yes"
-        for arg; do
+        for a in "$@"; do
             if [[ -e "$arg" && $(du -k "$arg"|cut -f1) -ge 1024 ]]; then
-                swap="no"
+                vim -n "$@"
+                return
             fi
         done
-        if [[ "no" == "$swap" ]]; then
-            vim -n "$@"
-        else
-            vim "$@"
-        fi
+        vim "$@"
     }
-elif which vi >& /dev/null; then
+elif type -t vi >& /dev/null; then
 	EDITOR=vi
 	VISUAL=vi
 	export EDITOR VISUAL
@@ -103,65 +92,6 @@ shopt -s checkwinsize
 if [ -f /etc/bash_completion -a -z "$BASH_COMPLETION" ]; then
     . /etc/bash_completion
 fi
-
-# Clear the PROMPT_COMMAND, done before PS1.
-export PROMPT_COMMAND='ret=$?;'
-# Change the window title of X terminals
-case $TERM in
-	xterm*|rxvt|Eterm|eterm)
-        # Must use \033 and not \e here.
-		export PROMPT_COMMAND="$PROMPT_COMMAND"'echo -ne "\033]0;${USER}@${HOSTNAME%%.*}:${PWD/$HOME/~}\007"'
-		;;
-	screen)
-		export PROMPT_COMMAND="$PROMPT_COMMAND"'echo -ne "\033_${USER}@${HOSTNAME%%.*}:${PWD/$HOME/~}\e\\"'
-		;;
-esac
-
-# Set the fancy prompt, start by removing what was there.
-# And move the cursor to the start: http://jonisalonen.com/2012/your-bash-prompt-needs-this/
-PS1="\[\e[00;00m\]\[\e[G\]"
-# Just for Debian set var with chroot you're in (used in the prompt below)
-if [ -z "$debian_chroot" ] && [ -r /etc/debian_chroot ]; then
-    debian_chroot="$(cat /etc/debian_chroot) "
-fi
-PS1="${PS1}${debian_chroot:+($debian_chroot)}"
-# Add the return code and time.
-function returnCodeColor {
-    if [[ $1 -eq 0 ]]; then
-        echo "00m"
-    else
-        echo "41m"
-    fi
-}
-PS1="${PS1}"'\[\e[00;$(returnCodeColor $ret)\]${ret}\[\e[00;00m\] \[\e[00;33m\]\D{%H:%M}\[\e[00m\] '
-# Add (user and) host, but not for root.
-if [[ $EUID -eq 0 ]]; then
-    PS1="$PS1"'\[\e[01;31m\]\h '
-else
-    PS1="$PS1"'\[\e[01;32m\]\u@\h\[\e[00m\]:'
-fi
-# Working dir.
-PS1="$PS1"'\[\e[01;34m\]\W\[\e[00;34m\]'
-# Git branch and dirty.
-function PS1GitBranchDirty {
-    if [[ $PWD == *".throw-away"* ]]; then
-        echo -n "[Throw Away Directory]"
-    fi
-    local br
-    br=$(git branch --no-color 2> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/\1/')
-    if [[ -z "$br" ]]; then
-        echo ""
-        return 0
-    fi
-    echo -n "[$br"
-    lastGitStatusLine=$(git status 2> /dev/null | tail -n1)
-    if [[ "$lastGitStatusLine" != 'nothing to commit (working directory clean)' 
-        && "$lastGitStatusLine" != 'nothing to commit, working directory clean' ]]; then
-        echo -n '*'
-    fi
-    echo "]"
-}
-export PS1="$PS1"'$(PS1GitBranchDirty)\$\[\e[00m\] '
 
 # HISTORY things
 shopt -s histappend
@@ -281,7 +211,6 @@ alias dmesg=dmesg_with_human_timestamps
 # Func to create a `tad` (throw away directory).  Call this, it will spawn a
 # new shell in the newly-created dir, and then when you exit the shell the
 # directory is deleted with everything inside of it.
-# PS1 also includes an indication of this.
 tad() {
     local d="$HOME/.throw-away"
     if [[ -e "$d" ]]; then
@@ -293,3 +222,65 @@ tad() {
         rm -r $d
     fi
 }
+
+# Git aliases, same everywhere.
+alias gs='git remote -v;git branch -v;git status -v'
+alias gb='git branch'
+alias go='git checkout'
+
+# Git branch from:
+#    http://aaroncrane.co.uk/2009/03/git_branch_prompt/
+# Everything is in the shell, no forks, accounts for bad format, var includes
+# the `[` and `]` or is empty.
+function find_git_branch {
+    local dir=. head
+    until [ "$dir" -ef / ]; do
+        if [ -f "$dir/.git/HEAD" ]; then
+            head=$(< "$dir/.git/HEAD")
+            if [[ $head == ref:\ refs/heads/* ]]; then
+                git_branch="[${head#*/*/}]"
+            elif [[ $head != '' ]]; then
+                git_branch='[(detached)]'
+            else
+                git_branch='[(unknown)]'
+            fi
+            return
+        fi
+        dir="../$dir"
+    done
+    git_branch=''
+}
+
+# Clear the PROMPT_COMMAND, done before PS1 (which uses `ret).
+export PROMPT_COMMAND='ret=$?;find_git_branch'
+
+# Set the fancy prompt, start by removing what was there.
+# And move the cursor to the start:
+#    http://jonisalonen.com/2012/your-bash-prompt-needs-this/
+PS1="\[\e[00;00m\]\[\e[G\]"
+# Just for Debian set var with chroot you're in (used in the prompt below)
+if [ -z "$debian_chroot" ] && [ -r /etc/debian_chroot ]; then
+    debian_chroot="$(cat /etc/debian_chroot) "
+fi
+PS1="${PS1}${debian_chroot:+($debian_chroot)}"
+# Add the return code and time.
+function returnCodeColor {
+    if [[ $1 -eq 0 ]]; then
+        echo "00m"
+    else
+        echo "41m"
+    fi
+}
+PS1="${PS1}"'\[\e[00;$(returnCodeColor $ret)\]${ret}\[\e[00;00m\] \[\e[00;33m\]\D{%H:%M}\[\e[00m\] '
+# Add (user and) host, but not for root.
+if [[ $EUID -eq 0 ]]; then
+    PS1="$PS1"'\[\e[01;31m\]\h '
+else
+    PS1="$PS1"'\[\e[01;32m\]\u@\h\[\e[00m\]:'
+fi
+# Working dir.
+export PS1="$PS1"'\[\e[01;34m\]\W\[\e[00;34m\]'"\$git_branch"'\$\[\e[00m\] '
+
+
+
+[ -f "$HOME/.motd" ] && cat "$HOME/.motd"
