@@ -71,7 +71,7 @@ alias g='grep -iE'
 alias gr='grep -rinsEH'
 
 alias ps='COLUMNS=400 ps'
-alias p='ps -elf'
+alias p='ps -ef'
 if cal -3 >&/dev/null; then
 	alias cal='cal -3'
 fi
