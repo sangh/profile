@@ -224,8 +224,8 @@ tad() {
 }
 
 # Git aliases, same everywhere.
-alias gs='git remote -v;git branch -v;git status -v'
-alias gb='git branch'
+alias gs='git status'
+alias gb='git remote -v;git branch -v'
 alias go='git checkout'
 
 # Git branch from:
