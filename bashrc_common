@@ -223,6 +223,8 @@ tad() {
     fi
 }
 
+alias t='exec tmux attach'
+
 # Git aliases, same everywhere.
 alias gs='git status'
 alias gb='git remote -v;git branch -v'
