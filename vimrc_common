@@ -108,8 +108,8 @@ vnoremap > >gv
 
 " Sometimes detected as Modula-2, which I'll never use.
 autocmd BufNewFile,BufReadPost,BufFilePre,BufRead *.md set filetype=markdown
-autocmd BufNewFile,BufReadPost,BufFilePre,BufRead *.md set textwidth=79
-autocmd BufNewFile,BufReadPost,BufFilePre,BufRead *.md set wrapmargin=79
+autocmd BufNewFile,BufReadPost,BufFilePre,BufRead *.md set textwidth=78
+autocmd BufNewFile,BufReadPost,BufFilePre,BufRead *.md set wrapmargin=78
 
 " Switch syntax highlighting on, when the terminal has colors
 syntax enable
