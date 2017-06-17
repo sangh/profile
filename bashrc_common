@@ -229,6 +229,7 @@ alias t='exec tmux attach'
 alias gs='git status'
 alias gb='git remote -v;git branch -v'
 alias go='git checkout'
+alias gd='git diff'
 
 # Git branch from:
 #    http://aaroncrane.co.uk/2009/03/git_branch_prompt/
