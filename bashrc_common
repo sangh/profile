@@ -65,24 +65,11 @@ if cal -3 >&/dev/null; then
 	alias cal='cal -3'
 fi
 
-# Path stuff.
-pathmunge () {
-	if ! echo ":${PATH}:" | grep ":${1}:" >&/dev/null; then
-		if [ "$2" = "after" ] ; then
-			PATH="$PATH:$1"
-		else
-			PATH="$1:$PATH"
-		fi
-	fi
-}
-
-# User's bin is more important than everything.
-pathmunge "$HOME/bin"
-# profile is after everything
-pathmunge "$HOME/profile" after
-# finally the local dir
-pathmunge "." after
-
+# PATH stuff:  The user's bin is more important than everything, then
+# profile after everything else, and then finally the local dir at the end.
+PATH="$HOME/bin:$PATH"
+PATH="$PATH:$HOME/profile"
+PATH="$PATH:."
 export PATH
 
 # Check the window size after every command.
