@@ -120,11 +120,6 @@ try
 catch /^Vim\%((\a\+)\)\=:E185/
     " Do nothing.
 endtry
-if &term=="xterm"
-     set t_Co=8
-     set t_Sb=^[4%dm
-     set t_Sf=^[3%dm
-endif
 " After the color scheme.
 if v:version > 702
     set colorcolumn=80
