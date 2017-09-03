@@ -1,7 +1,7 @@
 $if Bash
 
+    set horizontal-scroll-mode off
     set bell-style visible
-
     set completion-ignore-case on
 
     # One tab does the completion.
