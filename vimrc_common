@@ -46,7 +46,6 @@ else
 endif
 " IncSearch doesn't do this, and can't be on the same line.
 cnoremap %s/ %s/\v
-set hlsearch
 set wrapscan  " Always wrap around.
 set ignorecase  " This makes search case insensitive when the pattern is all lowercase.
 set smartcase
