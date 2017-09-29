@@ -60,7 +60,14 @@ alias g='grep -iE'
 alias gr='grep -rinsEH'
 
 alias ps='COLUMNS=400 ps'
-alias p='ps -ef'
+p() {
+    if [[ 0 -eq $# ]]; then
+        ps -ef
+    else
+        ps -ef | g "$@"
+    fi
+}
+
 if cal -3 >&/dev/null; then
 	alias cal='cal -3'
 fi
