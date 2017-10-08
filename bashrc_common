@@ -226,6 +226,7 @@ alias go='git checkout'
 alias gt='git log --graph --decorate --pretty=oneline --abbrev-commit'
 alias gd='git diff'
 alias gdn='git diff --name-only'
+alias gp='git fetch && git rebase'
 
 # Git branch from:
 #    http://aaroncrane.co.uk/2009/03/git_branch_prompt/
