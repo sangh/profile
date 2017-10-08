@@ -5,26 +5,6 @@ ADDED_BY_LINE="# Added by $0"
 echo
 
 
-if ! [[ -e "$HOME/.ssh" ]]; then
-    echo "Creating and chmoding the \"$HOME/.ssh\" dir."
-    mkdir "$HOME/.ssh"
-    chmod go-rwxXst "$HOME/.ssh"
-fi
-if [[ -d "$HOME/.ssh" ]]; then
-    # Needs to be a separate conditional.
-    if ! [[ -e "$HOME/.ssh/config" ]]; then
-        echo "Creating and chmoding the \"$HOME/.ssh/config\" file."
-        touch "$HOME/.ssh/config"
-        chmod go-rwxXst "$HOME/.ssh/config"
-    fi
-else
-    echo "\"$HOME/.ssh\" is not a dir?  What?" >&2
-fi
-
-
-echo
-
-
 if ! [[ -f "$HOME/.tmux.conf" ]]; then
     echo "Creating a \"$HOME/.tmux.conf\" file."
 fi
