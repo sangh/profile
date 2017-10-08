@@ -60,7 +60,7 @@ alias g='grep -iE'
 alias gr='grep -rinsEH'
 
 alias ps='COLUMNS=400 ps'
-p() {
+function p() {
     if [[ 0 -eq $# ]]; then
         ps -ef
     else
@@ -223,8 +223,9 @@ alias t='exec tmux attach'
 alias gs='git status'
 alias gb='git remote -v;git branch -v'
 alias go='git checkout'
-alias gd='git diff'
 alias gt='git log --graph --decorate --pretty=oneline --abbrev-commit'
+alias gd='git diff'
+alias gdn='git diff --name-only'
 
 # Git branch from:
 #    http://aaroncrane.co.uk/2009/03/git_branch_prompt/
