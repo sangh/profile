@@ -162,7 +162,7 @@ execute 'nnoremap <leader>at :w!<CR>:!aspell --dont-backup --encoding=UTF-8 --mo
 " This is sdate.
 execute 'nnoremap <leader>s :r!sdate<CR>kJ$'
 " This is the total thing
-execute 'nnoremap <leader>t yypkI.005+(<Esc>A)<Esc>!!b<CR>0f.lllDA<Space>'
+execute 'nnoremap <leader>t yypkI.005+(<Esc>A)<Esc>!!b<CR>0f.lllD:r!sdate<CR>kJJ0f.llli<Space>'
 " BC !
 execute 'nnoremap <leader>b !!b<CR>'
 " URL convert
