@@ -63,7 +63,7 @@ if grep "^source $HOME/profile/vimrc_common\$" "$HOME/.vimrc" >&/dev/null; then
 else
     echo "Appending \"source $HOME/profile/vimrc_common\" to \"$HOME/.vimrc\""
     echo >> "$HOME/.vimrc"
-    echo "${ADDED_BY_LINE}" >> "$HOME/.vimrc"
+    echo "\"${ADDED_BY_LINE:1}" >> "$HOME/.vimrc"
     echo "source $HOME/profile/vimrc_common" >> "$HOME/.vimrc"
 fi
 
