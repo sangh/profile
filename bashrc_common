@@ -27,7 +27,7 @@ else
 fi
 alias la='l -a'
 alias ll='la -l'
-alias d='du -hs `\ls -A --quoting-style=shell-always`'
+alias d="find . -maxdepth 1 -mindepth 1 -exec du -hs '{}' ';'"
 unalias v >&/dev/null
 unset v
 if type -t vim >& /dev/null; then
