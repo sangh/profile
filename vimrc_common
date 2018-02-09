@@ -52,8 +52,6 @@ set smartcase
 set gdefault  " All substitutions are global
 call plug#end()
 
-filetype plugin indent on
-
 " When editing a file, always jump to the last cursor position
 autocmd BufReadPost * if line("'\"") | exe "'\"" | endif
 
@@ -99,7 +97,12 @@ set autoread
 set fileformats+=mac
 set modelines=0  " Do not use modelines, from other people.
 set hidden  "Save the buffer, like when useing :e
-set ai  " always set autoindenting on
+set ai  "autoindent (cp prev line), some plugins enable in, so set it.
+filetype plugin indent on
+" Don't use Ex mode, use Q for formatting
+noremap Q gq
+
+
 
 " Visual shifting (does not exit Visual mode), donno about this.
 vnoremap < <gv
@@ -126,23 +129,6 @@ else
     highlight OverLength ctermbg=red ctermfg=white guibg=#592929
     match OverLength /\%81v.\+/
 endif
-
-set cindent
-
-augroup cprog
-    " Remove all cprog autocommands
-    au!
-
-    " When starting to edit a file:
-    "   For C and C++ files set formatting of comments and set C-indenting on.
-    "   For other files switch it off.
-    "   Don't change the order, it's important that the line with * comes first.
-    autocmd FileType *      set formatoptions=tcql nocindent comments&
-    autocmd FileType c,cpp  set formatoptions=croql cindent comments=sr:/*,mb:*,el:*/,://
-augroup END
-
-" Don't use Ex mode, use Q for formatting
-map Q gq
 
 " OK, this is weird, use ; as well as : for the same thing.
 nnoremap ; :
