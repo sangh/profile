@@ -154,6 +154,15 @@ fi
 
 echo
 
+progs=""
+for p in cv entr icdiff ; do
+    if ! type ${p}; then
+        progs="${progs} ${p}"
+    fi
+done
+if [[ -n "${progs}" ]]; then
+    echo "This/these are NOT INSTALLED, please install them:  ${progs}"
+fi
 
 echo
 echo "------------------  Done."
