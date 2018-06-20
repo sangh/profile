@@ -91,46 +91,6 @@ fi
 echo
 
 
-
-PROG="icdiff"
-GH_PROG_URL='https://github.com/jeffkaufman/icdiff'
-
-if [[ -e "$HOME/bin/$PROG" ]]; then
-    echo "------------------  Found \"$HOME/bin/$PROG\"."
-else
-    echo "Calling \"git clone $GH_PROG_URL\"."
-    pushd "$HOME/bin/src"
-    git clone $GH_PROG_URL
-    cd ..
-    ln -s "src/$PROG/$PROG"
-    popd
-fi
-
-
-echo
-
-
-PROG="cv"
-GH_PROG_URL='https://github.com/Xfennec/cv'
-
-if [[ -e "$HOME/bin/$PROG" || -L "$HOME/bin/$PROG" ]]; then
-    echo "------------------  Found \"$HOME/bin/$PROG\"."
-else
-    echo "Calling \"git clone $GH_PROG_URL\"."
-    pushd "$HOME/bin/src"
-    git clone $GH_PROG_URL
-    cd "$PROG"
-    make
-    cd ..
-    cd ..
-    ln -s "src/$PROG/$PROG"
-    popd
-fi
-
-
-echo
-
-
 if [[ -r "$HOME/.vim/autoload/plug.vim" ]]; then
     echo "------------------  Found \"$HOME/.vim/autoload/plug.vim\"."
 else
@@ -155,13 +115,20 @@ fi
 echo
 
 progs=""
-for p in cv entr icdiff ; do
+for p in progress entr icdiff ; do
     if ! type ${p}; then
         progs="${progs} ${p}"
     fi
 done
 if [[ -n "${progs}" ]]; then
     echo "This/these are NOT INSTALLED, please install them:  ${progs}"
+    echo "Some commands w/URL~s that may be helpful:"
+    echo "    apt install icdiff entr progress"
+    echo "    cd ~/bin/src"
+    echo "    git clone 'https://github.com/jeffkaufman/icdiff'"
+    echo "    git clone 'https://github.com/Xfennec/progress'"
+    echo "    Look at: http://www.entrproject.org/code/ get latest."
+    echo "    Then go into all of them and make and ln to bin."
 fi
 
 echo
