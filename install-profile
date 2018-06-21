@@ -91,6 +91,13 @@ fi
 echo
 
 
+# Just noting this here for now, but should write this out to check everything
+# and autoload in the future.
+# For Neovim you need a bunch of symlinks (and cearte parent dirs):
+#    .vimrc -> .config/nvim/init.vim
+#    .vim -> .local/share/nvim/
+#    .local/share/nvim/autoload -> site/autoload/
+
 if [[ -r "$HOME/.vim/autoload/plug.vim" ]]; then
     echo "------------------  Found \"$HOME/.vim/autoload/plug.vim\"."
 else
