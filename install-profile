@@ -97,6 +97,13 @@ echo
 #    .vimrc -> .config/nvim/init.vim
 #    .vim -> .local/share/nvim/
 #    .local/share/nvim/autoload -> site/autoload/
+# by:
+#   mkdir -p "$HOME/.config/nvim"
+#   touch "$HOME/.config/nvim/init.vim"
+#   ln -s .config/nvim/init.vim "$HOME/.vimrc"
+#   mkdir -p "$HOME/.local/share/nvim/site/autoload"
+#   ln -s .local/share/nvim "$HOME/.vim"
+#   ln -s site/autoload "$HOME/.local/share/nvim/autoload"
 
 if [[ -r "$HOME/.vim/autoload/plug.vim" ]]; then
     echo "------------------  Found \"$HOME/.vim/autoload/plug.vim\"."
