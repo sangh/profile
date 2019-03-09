@@ -145,6 +145,13 @@ if [[ -n "${progs}" ]]; then
     echo "    Then go into all of them and make and ln to bin."
 fi
 
+if [[ ! -e "/usr/local/bin/python3" ]]; then
+    echo
+    echo "--------------------------"
+    echo
+    echo "It appears that /usr/local/bin/python3 does not exist!"
+fi
+
 echo
 echo "------------------  Done."
 echo
