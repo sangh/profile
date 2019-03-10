@@ -27,7 +27,7 @@ else
 fi
 alias la='l -a'
 alias ll='la -l'
-alias d="find . -maxdepth 1 -mindepth 1 -exec du -hs '{}' ';'"
+alias d="find . -maxdepth 1 -mindepth 1 -print0|sort -z|xargs -0 -L 1 -n 1 du -hs"
 unalias v >&/dev/null
 unset v
 if type -t vim >& /dev/null; then
