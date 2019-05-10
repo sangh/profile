@@ -68,12 +68,11 @@ fi
 alias g='grep -iE'
 alias gr='grep -rinsEH'
 
-alias ps='COLUMNS=400 ps'
 function p() {
     if [[ 0 -eq $# ]]; then
-        ps -ef
+        ps -eflww
     else
-        ps -ef | g "$@"
+        ps -eflww | g "$@"
     fi
 }
 
