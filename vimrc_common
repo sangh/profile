@@ -12,9 +12,7 @@ Plug 'tpope/vim-speeddating'
 autocmd VimEnter * if exists(":SpeedDatingFormat") |
     \ SpeedDatingFormat %d%b%y | endif  " sdate
 Plug 'jpalardy/vim-slime'
-if v:version > 702
-    Plug 'myusuf3/numbers.vim'
-endif
+Plug 'myusuf3/numbers.vim'
 set number " Line numbers, need even if `myusuf3/numbers.vim` isn't there.
 Plug 'rstacruz/sparkup'
 Plug 'ntpeters/vim-better-whitespace'
@@ -30,26 +28,24 @@ let g:airline_left_sep='›' " Slightly fancier than '>'
 let g:airline_right_sep='‹' " Slightly fancier than '<'
 set laststatus=2  " Always show.
 Plug 'bling/vim-bufferline'
-if v:version < 704
-    nnoremap / /\v
-    vnoremap / /\v
-else
-    Plug 'haya14busa/incsearch.vim'
-    autocmd VimEnter * if exists(":IncSearchMap") |
-        \ map / <Plug>(incsearch-forward)|
-        \ map ? <Plug>(incsearch-backward)|
-        \ map g/ <Plug>(incsearch-stay)|
-        \ let g:incsearch#auto_nohlsearch = 1 |
-        \ let g:incsearch#magic = '\v' |
-        \ endif
-endif
-" IncSearch doesn't do this, and can't be on the same line.
-cnoremap %s/ %s/\v
-set wrapscan  " Always wrap around.
+call plug#end()
+
 set ignorecase  " This makes search case insensitive when the pattern is all lowercase.
 set smartcase
+set incsearch
+set hlsearch
+nnoremap / /\v
+vnoremap / /\v
+cnoremap %s/ %smagic/
+cnoremap \>s/ \>smagic/
+nnoremap :g/ :g/\v
+nnoremap :g// :g//
+nnoremap <C-l> :nohlsearch<CR><C-l>
+autocmd InsertEnter * :setlocal nohlsearch
+autocmd InsertLeave * :setlocal hlsearch
+
+set wrapscan  " Always wrap around.
 set gdefault  " All substitutions are global
-call plug#end()
 
 " When editing a file, always jump to the last cursor position
 autocmd BufReadPost * if line("'\"") | exe "'\"" | endif
