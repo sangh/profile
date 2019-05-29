@@ -70,9 +70,9 @@ alias gr='grep -rinsEH'
 
 function p() {
     if [[ 0 -eq $# ]]; then
-        ps -eflww
+        ps -efww
     else
-        ps -eflww | g "$@"
+        ps -efww | g "$@"
     fi
 }
 
