@@ -135,11 +135,17 @@ vnoremap ; :
 nnoremap \ ;
 vnoremap \ ;
 
-
-execute 'nnoremap <leader>aa :w!<CR>:!aspell --dont-backup --encoding=UTF-8 --mode=none check "%"<CR>:e! "%"<CR><CR>'
-execute 'nnoremap <leader>ae :w!<CR>:!aspell --dont-backup --encoding=UTF-8 --mode=email check "%"<CR>:e! "%"<CR><CR>'
-execute 'nnoremap <leader>ah :w!<CR>:!aspell --dont-backup --encoding=UTF-8 --mode=html check "%"<CR>:e! "%"<CR><CR>'
-execute 'nnoremap <leader>at :w!<CR>:!aspell --dont-backup --encoding=UTF-8 --mode=tex check "%"<CR>:e! "%"<CR><CR>'
+if has('nvim')
+    execute 'nnoremap <leader>aa :w!<CR>:terminal aspell --dont-backup --encoding=UTF-8 --mode=none check "%"<CR>:e! "%"<CR><CR>'
+    execute 'nnoremap <leader>ae :w!<CR>:terminal aspell --dont-backup --encoding=UTF-8 --mode=email check "%"<CR>:e! "%"<CR><CR>'
+    execute 'nnoremap <leader>ah :w!<CR>:terminal aspell --dont-backup --encoding=UTF-8 --mode=html check "%"<CR>:e! "%"<CR><CR>'
+    execute 'nnoremap <leader>at :w!<CR>:terminal aspell --dont-backup --encoding=UTF-8 --mode=tex check "%"<CR>:e! "%"<CR><CR>'
+else
+    execute 'nnoremap <leader>aa :w!<CR>:!aspell --dont-backup --encoding=UTF-8 --mode=none check "%"<CR>:e! "%"<CR><CR>'
+    execute 'nnoremap <leader>ae :w!<CR>:!aspell --dont-backup --encoding=UTF-8 --mode=email check "%"<CR>:e! "%"<CR><CR>'
+    execute 'nnoremap <leader>ah :w!<CR>:!aspell --dont-backup --encoding=UTF-8 --mode=html check "%"<CR>:e! "%"<CR><CR>'
+    execute 'nnoremap <leader>at :w!<CR>:!aspell --dont-backup --encoding=UTF-8 --mode=tex check "%"<CR>:e! "%"<CR><CR>'
+endif
 " This is sdate.
 execute 'nnoremap <leader>s :r!sdate<CR>kJ$'
 " This is the total thing
