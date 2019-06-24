@@ -1,8 +1,6 @@
-#!/usr/bin/python
+#!/usr/local/bin/python3
 
-import datetime
-import sys
-import re
+import datetime, sys, re
 
 # New python implementation of sumlines.
 # This isn't quite as loose as the old sumlines.
@@ -10,12 +8,10 @@ import re
 # If any line of output contains a `:' then it should be
 # treated as a warning by the display program.
 
-help = """
-
+help_ = """
 Usage:  %s [flag1, flag2, ...] [date] [filename]
 
     By default only print the sum of the lines.
-
 
 Flags (short flags must be separate arguments):
 
@@ -47,17 +43,15 @@ Flags (short flags must be separate arguments):
     --help
         Print this help and exit.
 
-
 Date (default: today):
 
-    Date, in the format ddmmmyy or yyyy-mm-dd, like 01Jan10, 31Oct08, or 2204-10-30.
-
+    Date format is ddmmmyy or yyyy-mm-dd like 01Jan10, 31Oct08, or 2204-10-30.
 
 Filename (default: stdin):
 
     Filename to open, do not provide for stdin.
 
-""" % ( sys.argv[0], )
+""" % (sys.argv[0], )
 
 futureDates = False
 quiet = False
@@ -65,86 +59,75 @@ resetAfterZero = False
 printHTML = False
 printParsed = False
 
+def wrn(s):
+    if not quiet:
+        print(f"Warning: {s}", file=sys.stderr)
 
-def wrn( s ):
-    if( not quiet ):
-        print >> sys.stderr, "Warning: %s"%s
-def err( s ):
-    print
-    print >> sys.stderr, "Error: %s"%s
-    print
-    print >> sys.stderr, help
-    sys.exit( 1 )
+def err(s):
+    print(f"\nError: {s}\n\n{help_}")
+    sys.exit(1)
 
-
-oldest_possible_date_num = "0000-00-00"
-
-def date_to_number( d ):
+def date_to_number(d):
     day = d[0:2]
     mon = d[2:5]
     yea = d[5:7]
-    if  ( mon == "Jan" ): mon = "01"
-    elif( mon == "Feb" ): mon = "02"
-    elif( mon == "Mar" ): mon = "03"
-    elif( mon == "Apr" ): mon = "04"
-    elif( mon == "May" ): mon = "05"
-    elif( mon == "Jun" ): mon = "06"
-    elif( mon == "Jul" ): mon = "07"
-    elif( mon == "Aug" ): mon = "08"
-    elif( mon == "Sep" ): mon = "09"
-    elif( mon == "Oct" ): mon = "10"
-    elif( mon == "Nov" ): mon = "11"
-    elif( mon == "Dec" ): mon = "12"
+    if  (mon == "Jan" ): mon = "01"
+    elif(mon == "Feb" ): mon = "02"
+    elif(mon == "Mar" ): mon = "03"
+    elif(mon == "Apr" ): mon = "04"
+    elif(mon == "May" ): mon = "05"
+    elif(mon == "Jun" ): mon = "06"
+    elif(mon == "Jul" ): mon = "07"
+    elif(mon == "Aug" ): mon = "08"
+    elif(mon == "Sep" ): mon = "09"
+    elif(mon == "Oct" ): mon = "10"
+    elif(mon == "Nov" ): mon = "11"
+    elif(mon == "Dec" ): mon = "12"
     else: return d
 
     return "20%s-%s-%s"%(yea, mon, day)
-
 
 # OK, so we have the args, and flags could be anywhere, so we take those out
 # right after we remove the program name.
 args = []
 noMoreFlags = False
 for arg in sys.argv[1:] :
-    if( noMoreFlags ) : args.append( arg )
-    elif "-f" == arg or "--futureDates"     == arg  : futureDates       = True
-    elif "-q" == arg or "--quiet"           == arg  : quiet             = True
-    elif "-z" == arg or "--resetAfterZero"  == arg  : resetAfterZero    = True
-    elif "-t" == arg or "--printHTML"       == arg  : printHTML         = True
-    elif "-p" == arg or "--printParsed"     == arg  : printParsed       = True
-    elif "-h" == arg or "-?" == arg  or  "--help" == arg :
-        print >> sys.stderr, help
-        sys.exit( 0 )
-    elif "--" == arg : noMoreFlags = True
-    elif "-" == arg[0] : err( "Unknown flag: " + arg )
-    else             : args.append( arg )
+    if(noMoreFlags): args.append( arg )
+    elif "-f" == arg or "--futureDates"    == arg: futureDates    = True
+    elif "-q" == arg or "--quiet"          == arg: quiet          = True
+    elif "-z" == arg or "--resetAfterZero" == arg: resetAfterZero = True
+    elif "-t" == arg or "--printHTML"      == arg: printHTML      = True
+    elif "-p" == arg or "--printParsed"    == arg: printParsed    = True
+    elif "-h" == arg or "-?" == arg  or  "--help" == arg:
+        print(help_, file=sys.stderr)
+        sys.exit(0)
+    elif "--" == arg  : noMoreFlags = True
+    elif "-" == arg[0]: err(f"Unknown flag: {arg}")
+    else              : args.append(arg)
 
 # Now we see how big args is.
-if len( args )  > 2 : err( "Too many arguments." )
-if len( args ) == 2 :
-    today_date = args[ 0 ]
-    fin  = open( args[ 1 ] )
-else :
+if len(args) > 2: err( "Too many arguments." )
+if len(args) == 2:
+    today_date = args[0]
+    fin = open(args[1])
+else:
     # We use today's date
     today_date = datetime.date.today().strftime("%d%b%y")
-    if len( args ) == 1 :
-        fin  = open( args[ 0 ] )
-    else :
+    if len(args) == 1:
+        fin = open(args[0])
+    else:
         fin = sys.stdin
 
-
-
-if False :
-    print "sys.argv = ", sys.argv
-    print "futureDates = ", futureDates
-    print "quiet = ", quiet
-    print "resetAfterZero = ", resetAfterZero 
-    print "printHTML = ", printHTML
-    print "args = ", args
-    print "today_date = ", today_date
-    print "fine.name = ", fin.name
-    sys.exit( 0 )
-
-
+if False:
+    print(f"sys.argv = {sys.argv}")
+    print(f"futureDates = {futureDates}")
+    print(f"quiet = {quiet}")
+    print(f"resetAfterZero = {resetAfterZero }")
+    print(f"printHTML = {printHTML}")
+    print(f"args = {args}")
+    print(f"today_date = {today_date}")
+    print(f"fine.name = {fin.name}")
+    sys.exit(0)
 
 # Number forms: 2, -2, +2, 123.3, -23.1, +123.2, .3, +.3, -.3
 amount_str = """[+-]?\d*[.]?\d+"""
@@ -152,68 +135,63 @@ date_str = """\d{2}(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\d{2}|\d{4
 # The above two are delimiters of sorts, the line con look like:
 # amt desc date explain.
 # amt is always at the bigining of the line, capture rest of line.
-reamt = re.compile ("""^\s*(%s)(\s.*|$)"""%amount_str)
+reamt = re.compile ("""^\s*(%s)(\s.*|$)""" % amount_str)
 # Capture the befroe and after of the date.
-redate = re.compile("""(^|.*\s)(%s)(\s.*|$)"""%date_str)
-
+redate = re.compile("""(^|.*\s)(%s)(\s.*|$)""" % date_str)
 
 # Check today's date.
 if not re.match(date_str, today_date):
-    err( "Date argument is not a valid date: " + today_date )
+    err(f"Date argument is not a valid date:  {today_date}")
 
-today_date_num = date_to_number( today_date )
-
-
-
+today_date_num = date_to_number(today_date)
 total = 0.0
-
 lineStore = []
 
-for line in fin :
+for line in fin:
     reamtm = reamt.match(line)
-    if not reamtm :
-        if "" != line.strip() :
-            wrn("Line not matched: " + line.strip())
+    if not reamtm:
+        if "" != line.strip():
+            wrn(f"Line not matched:  {line.strip()}")
         continue
-    line_amt = float( reamtm.group( 1 ) )
+    line_amt = float(reamtm.group(1))
     line_desc = ""
     line_date = ""
-    line_date_num = oldest_possible_date_num
+    line_date_num = "0000-00-00"
     line_expl = ""
     # group 2 is always there, but may be blank.
-    date_part_line = reamtm.group( 2 ).strip()
+    date_part_line = reamtm.group(2).strip()
     if "" != date_part_line :
         # See if there is a date
-        redatem = redate.match( date_part_line )
-        if redatem :
-            line_desc = redatem.group( 1 ).strip()
-            line_date = redatem.group( 2 )
-            line_date_num = date_to_number( line_date )
-            line_expl = redatem.group( 3 ).strip()
-        else :
+        redatem = redate.match(date_part_line)
+        if redatem:
+            line_desc = redatem.group(1).strip()
+            line_date = redatem.group(2)
+            line_date_num = date_to_number(line_date)
+            line_expl = redatem.group(3).strip()
+        else:
             line_desc = date_part_line
 
     # We only count lines today or older.
-    if not futureDates  and  today_date_num < line_date_num:
-        wrn("Not using future date: " + line.strip())
+    if not futureDates and today_date_num < line_date_num:
+        wrn(f"Not using future date:  {line.strip()}")
         continue
 
     total = total + line_amt
     # Should we clear the line buffer?
-    if resetAfterZero  and  total < .00001  and  total > -.00001 :
+    if resetAfterZero and total < .00001 and total > -.00001:
         lineStore = []
-    else :
+    else:
         # Save for later.
-        lineStore.append( [ line_amt, line_desc, line_date, line_expl ] )
+        lineStore.append([line_amt, line_desc, line_date, line_expl])
 
 # Now we do things with the parsed
-if printHTML :
+if printHTML:
     import cgi
-    def str_tr( str ):
-        if "" == str : return "-------"
-        else : return cgi.escape( str )
+    def str_tr(str):
+        if "" == str: return "-------"
+        else: return cgi.escape(str)
 
-    print """
+    print("""
 <style type="text/css">
     table#ledger {
         table-layout: fixed;
@@ -230,26 +208,26 @@ if printHTML :
     .desc { text-align: left; width: 50%; }
     .expl { text-align: left; width: 30%; }
 </style>
-"""
-    print """\n<table id="ledger">"""
-    for line in lineStore :
-        it = map( str_tr, line[1:] )
-        print "\t<tr>"
-        print """\t\t<td class="amt">%.2f</td>""" % ( line[0] )
-        print """\t\t<td class="date">%s</td>""" % ( it[1] )
-        print """\t\t<td class="desc">%s</td>""" % ( it[0] )
-        print """\t\t<td class="expl">%s</td>""" % ( it[2] )
-        print "\t</tr>"
-    print "</table>"
+""")
+    print("""\n<table id="ledger">""")
+    for line in lineStore:
+        it = map(str_tr, line[1:])
+        print("\t<tr>")
+        print("""\t\t<td class="amt">%.2f</td>""" % (line[0], ))
+        print("""\t\t<td class="date">%s</td>""" % (it[1], ))
+        print("""\t\t<td class="desc">%s</td>""" % (it[0], ))
+        print("""\t\t<td class="expl">%s</td>""" % (it[2], ))
+        print("\t</tr>")
+    print("</table>")
 
 
     # Exit after printing the HTML table.
-    sys.exit( 0 )
+    sys.exit(0)
 
 
-if printParsed :
-    for line in lineStore :
-        print line
+if printParsed:
+    for line in lineStore:
+        print(line)
 
 # Finally print the total.
-print "%.2f" % ( total )
+print("%.2f" % (total, ))
