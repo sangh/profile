@@ -211,7 +211,7 @@ if printHTML:
 """)
     print("""\n<table id="ledger">""")
     for line in lineStore:
-        it = map(str_tr, line[1:])
+        it = list(map(str_tr, line[1:]))
         print("\t<tr>")
         print("""\t\t<td class="amt">%.2f</td>""" % (line[0], ))
         print("""\t\t<td class="date">%s</td>""" % (it[1], ))
