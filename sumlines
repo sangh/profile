@@ -186,10 +186,10 @@ for line in fin:
 
 # Now we do things with the parsed
 if printHTML:
-    import cgi
+    from html import escape
     def str_tr(str):
         if "" == str: return "-------"
-        else: return cgi.escape(str)
+        else: return escape(str)
 
     print("""
 <style type="text/css">
