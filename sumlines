@@ -196,17 +196,16 @@ if printHTML:
     table#ledger {
         table-layout: fixed;
         border-style: none;
-        width: 100%;
     }
     td {
         vertical-align: text-top;
         padding-bottom: 5px;
-        width: 10%;
+        padding-right:  5px;
     }
     .amt { text-align: right; }
     .date { text-align: center; }
-    .desc { text-align: left; width: 50%; }
-    .expl { text-align: left; width: 30%; }
+    .desc { text-align: left; }
+    .expl { text-align: left; }
 </style>
 """)
     print("""\n<table id="ledger">""")
