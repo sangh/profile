@@ -1,197 +1,210 @@
 #!/usr/local/bin/python3
 
-import datetime, sys, re
-
-# New python implementation of sumlines.
-# This isn't quite as loose as the old sumlines.
-
-# If any line of output contains a `:' then it should be
-# treated as a warning by the display program.
-
 help_ = """
-Usage:  %s [flag1, flag2, ...] [date] [filename]
+Usage:  sumlines [--help] [--date YYYY-MM-DD | --json] [--] [filename]
 
-    By default only print the sum of the lines.
+    If no arguments are given, read lines from stdin, discard blank
+    lines, expect non-blank lines to start with a float followed by
+    white space, and then print the sum of all those floats (plus a
+    newline) to stdout.
 
-Flags (short flags must be separate arguments):
+    Any errors or warnings are printed to stderr.  If a file name
+    if given read from that file and do not read stdin at all.
+    
+    If either --date or --json is provided, input lines are mostly 
+    expected to contain a date somewhere in the line after the
+    initial float and white space.  Dates should be in YYYY-MM-DD
+    format (surrounded by white space or beginning or end of line),
+    but the format DDMonYY where Mon is the 3-letter capitalized
+    abbreviation of the month name (like Apr for April, using
+    strptime's %b format specifier) is also accepted for backwards
+    compatibility.  The whole format string that is passed to
+    strptime is "%d%b%y".
 
-    -f
-    --futureDates
-        Do not ignore future dates.
+    Input lines have leading and trailing white space removed and
+    are then split on runs of white space, and then any parts returned
+    (with warnings or in the JSON) are joined with a single space
+    (this effectively removes all consecutive white space).
 
-    -q
-    --quiet
-        Do not print warnings.
+    --date YYYY-MM-DD  (cannot be combined with --json)
+        Floats from lines with dates after the given date are not
+        included in the sum and a warning is printed to stderr.
+        Lines without a date are included in the sum and no warning
+        is printed.
 
-    -z
-    --resetAfterZero
-        Reset everything (printing) after sum hits zero.
+    --json  (cannot be combined with --date)
+        Print JSON to stdout.  Lines without a date and a non-zero
+        initial float are errors.  The returned JSON is an object with
+        two keys, "total" and "lines".  The value of "total" is a
+        decimal of the total of all floats in "lines".  The value of
+        "lines" is an array of lines from the input, sorted by date
+        (with lines with no date or the initial float is zero are kept
+        in place), each one an array of 4 elements:
 
-    -t
-    --printHTML
-        Print lines in an HTML table, and do not print the sum.
-
-    -p
-    --printParsed
-        Print out the parsed lines, and the sum, mostly for debugging
+            1) The float from the line.
+            2) The description (everything after the float and white
+               space until the date, or end of line if the line
+               does not contain a date).
+            3) The date in YYYY-MM-DD format (or an empty string).
+            4) The calculation (everything after the date or an empty
+               string).
 
     --
-        Treat all following arguments as something other than flags.
+        Take the argument after this to be a file name even if it
+        starts with a hyphen (for instance you could pass a file
+        named "--help" using this).
 
     -?
     -h
     --help
-        Print this help and exit.
+        Print this help to stderr and exit.
+"""
 
-Date (default: today):
+import datetime, json, sys, re
 
-    Date format is ddmmmyy or yyyy-mm-dd like 01Jan10, 31Oct08, or 2204-10-30.
-
-Filename (default: stdin):
-
-    Filename to open, do not provide for stdin.
-
-""" % (sys.argv[0], )
-
-futureDates = False
-quiet = False
-resetAfterZero = False
-printHTML = False
-printParsed = False
-
-def wrn(s):
-    if not quiet:
-        print(f"Warning: {s}", file=sys.stderr)
+def wrn(s, prefix="WARNING: "):
+    print(f"{prefix}{s}", file=sys.stderr)
 
 def err(s):
-    print(f"\nError: {s}\n\n{help_}")
+    wrn(f"{help_}\n\nERROR: {s}", prefix="")
     sys.exit(1)
 
-def date_to_number(d):
-    day = d[0:2]
-    mon = d[2:5]
-    yea = d[5:7]
-    if  (mon == "Jan" ): mon = "01"
-    elif(mon == "Feb" ): mon = "02"
-    elif(mon == "Mar" ): mon = "03"
-    elif(mon == "Apr" ): mon = "04"
-    elif(mon == "May" ): mon = "05"
-    elif(mon == "Jun" ): mon = "06"
-    elif(mon == "Jul" ): mon = "07"
-    elif(mon == "Aug" ): mon = "08"
-    elif(mon == "Sep" ): mon = "09"
-    elif(mon == "Oct" ): mon = "10"
-    elif(mon == "Nov" ): mon = "11"
-    elif(mon == "Dec" ): mon = "12"
-    else: return d
+arg_file = None
+arg_file_next = False
+arg_json = False
+arg_date = False
+arg_date_next = False
 
-    return "20%s-%s-%s"%(yea, mon, day)
-
-# OK, so we have the args, and flags could be anywhere, so we take those out
-# right after we remove the program name.
-args = []
-noMoreFlags = False
-for arg in sys.argv[1:] :
-    if(noMoreFlags): args.append( arg )
-    elif "-f" == arg or "--futureDates"    == arg: futureDates    = True
-    elif "-q" == arg or "--quiet"          == arg: quiet          = True
-    elif "-z" == arg or "--resetAfterZero" == arg: resetAfterZero = True
-    elif "-t" == arg or "--printHTML"      == arg: printHTML      = True
-    elif "-p" == arg or "--printParsed"    == arg: printParsed    = True
-    elif "-h" == arg or "-?" == arg  or  "--help" == arg:
-        print(help_, file=sys.stderr)
+for arg in sys.argv[1:]:
+    if len(arg) < 1:
+        err("Blank argument given.")
+    elif arg_date_next:
+        arg_date_next = False
+        if arg_date:
+            err(f"Second date given: {arg}")
+        arg_date = datetime.date.fromisoformat(arg).isoformat()
+    elif arg_file_next or arg[0] != "-":
+        if arg_file:
+            err(f"Second file name given: {arg}")
+        arg_file = arg
+    elif arg == "--date":
+        arg_date_next = True
+    elif arg == "--json":
+        if arg_json:
+            err("Argument --json given a second time.")
+        arg_json = True
+    elif arg == "--":
+        arg_file_next = True
+    elif arg in ("-?", "-h", "--help"):
+        wrn(help_, prefix="")
         sys.exit(0)
-    elif "--" == arg  : noMoreFlags = True
-    elif "-" == arg[0]: err(f"Unknown flag: {arg}")
-    else              : args.append(arg)
+    else:
+        err(f"Unknown flag: {arg}")
 
-# Now we see how big args is.
-if len(args) > 2: err( "Too many arguments." )
-if len(args) == 2:
-    today_date = args[0]
-    fin = open(args[1])
+if arg_date_next:
+    err("Argument --date given without the date following it.")
+if arg_json and arg_date:
+    err("Arguments --date and --json cannot be combined.")
+
+parse_line_date_regex = re.compile(
+        r"\d{2}"
+        r"(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)"
+        r"\d{2}|\d{4}-[01]\d-[0123]\d"
+        )
+def parse_line(line):
+    """Parse line into 4-tuple or throw.
+    The returned 4-tuple is (float(value), str(desc) or '',
+    "YYYY-MM-DD" or '', str(calc) or '').
+    If the float is approx. zero, the rest of the line becomes the
+    description.
+    """
+    line_split = line.split()
+    amt = float(line_split[0])
+    date = ''
+    for date_idx in range(len(line_split)-1, 1, -1):
+        if parse_line_date_regex.match(line_split[date_idx]):
+            try:
+                date = datetime.date \
+                        .fromisoformat(line_split[date_idx]) \
+                        .isoformat()
+                break
+            except Exception as exp:
+                try:
+                    date = datetime.datetime \
+                            .strptime(line_split[date_idx], "%d%b%y") \
+                            .date().isoformat()
+                    break
+                except Exception as exp:
+                    continue
+
+    if amt and date:
+        return (
+            amt,
+            ' '.join(line_split[1:date_idx]),
+            date,
+            ' '.join(line_split[(date_idx+1):]),
+            )
+    else:
+        return (amt, ' '.join(line_split[1:]), '', '')
+
+if arg_file:
+    arg_file = open(arg_file, "r")
 else:
-    # We use today's date
-    today_date = datetime.date.today().strftime("%d%b%y")
-    if len(args) == 1:
-        fin = open(args[0])
-    else:
-        fin = sys.stdin
+    arg_file = sys.stdin
 
-if False:
-    print(f"sys.argv = {sys.argv}")
-    print(f"futureDates = {futureDates}")
-    print(f"quiet = {quiet}")
-    print(f"resetAfterZero = {resetAfterZero }")
-    print(f"printHTML = {printHTML}")
-    print(f"args = {args}")
-    print(f"today_date = {today_date}")
-    print(f"fine.name = {fin.name}")
-    sys.exit(0)
-
-# Number forms: 2, -2, +2, 123.3, -23.1, +123.2, .3, +.3, -.3
-amount_str = """[+-]?\d*[.]?\d+"""
-date_str = """\d{2}(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\d{2}|\d{4}-[01]\d-[0123]\d"""
-# The above two are delimiters of sorts, the line con look like:
-# amt desc date explain.
-# amt is always at the bigining of the line, capture rest of line.
-reamt = re.compile ("""^\s*(%s)(\s.*|$)""" % amount_str)
-# Capture the befroe and after of the date.
-redate = re.compile("""(^|.*\s)(%s)(\s.*|$)""" % date_str)
-
-# Check today's date.
-if not re.match(date_str, today_date):
-    err(f"Date argument is not a valid date:  {today_date}")
-
-today_date_num = date_to_number(today_date)
 total = 0.0
-lineStore = []
-
-for line in fin:
-    reamtm = reamt.match(line)
-    if not reamtm:
-        if "" != line.strip():
-            wrn(f"Line not matched:  {line.strip()}")
+json_list = []
+for line_raw in arg_file:
+    line = line_raw.strip()
+    if not line:
         continue
-    line_amt = float(reamtm.group(1))
-    line_desc = ""
-    line_date = ""
-    line_date_num = "0000-00-00"
-    line_expl = ""
-    # group 2 is always there, but may be blank.
-    date_part_line = reamtm.group(2).strip()
-    if "" != date_part_line :
-        # See if there is a date
-        redatem = redate.match(date_part_line)
-        if redatem:
-            line_desc = redatem.group(1).strip()
-            line_date = redatem.group(2)
-            line_date_num = date_to_number(line_date)
-            line_expl = redatem.group(3).strip()
-        else:
-            line_desc = date_part_line
-
-    # We only count lines today or older.
-    if not futureDates and today_date_num < line_date_num:
-        wrn(f"Not using future date:  {line.strip()}")
-        continue
-
-    total = total + line_amt
-    # Should we clear the line buffer?
-    if resetAfterZero and total < .00001 and total > -.00001:
-        lineStore = []
+    line = parse_line(line)
+    if arg_date and line[2] and line[2] > arg_date:
+        wrn(f"Not using future line: {line[0]!r} {' '.join(line[1:])}")
     else:
-        # Save for later.
-        lineStore.append([line_amt, line_desc, line_date, line_expl])
+        total = total + line[0]
+        if arg_json:
+            # We can't append and then sort because there could be
+            # lines without a sort key (a date) and we want them to
+            # stay in place.  We could define our own compare function
+            # but that would be slower than this because the input is
+            # already mostly sorted and there are not many comments,
+            # so most of the time we are doing one compare and an appened.
+            if not line[2] or not json_list:
+                json_list.append(line)
+            elif json_list[-1][2] and json_list[-1][2] <= line[2]:
+                json_list.append(line)
+            else:  # The very slow way, starts from the begining.
+                # line[2] exists (checked in the 1st if), but any of the dates
+                # in this list may not exist (in which case insert after).
+                for i in range(len(json_list)):
+                    if not json_list[i][2]:
+                        continue
+                    if line[2] < json_list[i][2]:
+                        json_list[i:i] = [line]
+                        break
+                else:
+                    json_list.append(line)
 
-# Now we do things with the parsed
-if printHTML:
-    from html import escape
-    def str_tr(str):
-        if "" == str: return "-------"
-        else: return escape(str)
+arg_file.close()
 
-    print("""
+if arg_json:
+    print(json.dumps({'total': total, 'lines': json_list}))
+    #output_lines = []
+    #for line in json_list:
+        #output_line = []
+        #for i in line:
+            #output_line.append(repr(i))
+        #output_lines.append('[' + ', '.join(output_line) + ']')
+    #print(f'{{"total": {total}, "lines": [{", ".join(output_lines)}]}}')
+else:
+    print(f'{total:.2f}')
+
+
+# TODO test speed with and without try and the regex search.
+
+
+html_part = """
 <style type="text/css">
     table#ledger {
         table-layout: fixed;
@@ -207,7 +220,8 @@ if printHTML:
     .desc { text-align: left; }
     .expl { text-align: left; }
 </style>
-""")
+"""
+more_html = '''
     print("""\n<table id="ledger">""")
     for line in lineStore:
         it = list(map(str_tr, line[1:]))
@@ -218,15 +232,4 @@ if printHTML:
         print("""\t\t<td class="expl">%s</td>""" % (it[2], ))
         print("\t</tr>")
     print("</table>")
-
-
-    # Exit after printing the HTML table.
-    sys.exit(0)
-
-
-if printParsed:
-    for line in lineStore:
-        print(line)
-
-# Finally print the total.
-print("%.2f" % (total, ))
+'''
