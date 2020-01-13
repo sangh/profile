@@ -9,8 +9,6 @@ Plug 'altercation/vim-colors-solarized'
 Plug 'tpope/vim-repeat'
 Plug 'tpope/vim-surround'
 Plug 'tpope/vim-speeddating'
-autocmd VimEnter * if exists(":SpeedDatingFormat") |
-    \ SpeedDatingFormat %d%b%y | endif  " sdate
 Plug 'jpalardy/vim-slime'
 Plug 'myusuf3/numbers.vim'
 set number " Line numbers, need even if `myusuf3/numbers.vim` isn't there.
@@ -149,10 +147,10 @@ else
     execute 'nnoremap <leader>ah :w!<CR>:!aspell --dont-backup --encoding=UTF-8 --mode=html check "%"<CR>:e! "%"<CR><CR>'
     execute 'nnoremap <leader>at :w!<CR>:!aspell --dont-backup --encoding=UTF-8 --mode=tex check "%"<CR>:e! "%"<CR><CR>'
 endif
-" This is sdate.
-execute 'nnoremap <leader>s :r!sdate<CR>kJ$'
+" Insert date at end of line.
+execute "nnoremap <leader>s :put =strftime('%Y-%m-%d')<CR>kJ$"
 " This is the total thing
-execute 'nnoremap <leader>t yypkIvimrc_var_a=(<Esc>A);scale=2;vimrc_var_a/1<Esc>!!b<CR>:r!sdate<CR>kJJ0f.llli<Space>'
+execute "nnoremap <leader>t yypkIvimrc_var_a=(<Esc>A);scale=2;vimrc_var_a/1<Esc>!!b<CR>:put =strftime('%Y-%m-%d')<CR>kJJ0f.llli<Space>"
 " BC !
 execute 'nnoremap <leader>b !!b<CR>'
 " URL convert
