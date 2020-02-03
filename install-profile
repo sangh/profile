@@ -1,157 +1,197 @@
 #!/bin/bash
 
-ADDED_BY_LINE="# Added by $0"
+# This script should be run w/o arguments, and it should check if things
+# need to be added and do nothing if not, displaying any errors.
+# ~/.inputrc is checked b/c it shouldn't exist (if it does the global one
+# isn't used) and the inputrc_common is read from bashrc so that it can be
+# inside an if.  (When this is installed as a root user we want to be able to
+# selectivly not include any of my changes in bashrc, vimrc, or anything else,
+# and inputrc does not have a way to read environment variables.)
 
-echo
+# The syntax for .tmux.conf is:
+# %if #{==:#{SUDO_USER},user1}
+#     # Added by sangh/profile.
+#     bind-key Space next-window
+# %elif #{==:#{SUDO_USER},user2}
+#     # nothing.
+# %endif
+
+# The .vimrc syntax is:
+# if 'user1' == $SUDO_USER
+#     " Added by sangh/profile.
+#     source $HOME/profile/vimrc_common
+# elseif 'user1' == $SUDO_USER
+#     set nocompatible  " Must be first: use Vim defaults (much better!)
+#     set tabstop=4  " set the tab stop, duh!
+#     set shiftwidth=4  " the autoindent stuff
+#     set softtabstop=4  " Also sts
+#     set expandtab  " So we get spaces.
+#     set shiftround  " Use muliple of shiftwith with <>
+#     syntax on
+#     colorscheme desert
+#     set mouse=r
+# endif
+
+# The bashrc script to find/set SUDO_USER (if not set) is:
+# # This script tries to figure out which user sudo~ed or su~ed or whatever
+# # to root by going up the pid hierarchy until we find a non-root user.
+# # For most non-bastion machines this should already be set (propagated via
+# # SSH).  On base machines obviously there isn't anything to find, and on
+# # instances someone could sudo w/o using a bastion.
+# if [[ -z "$SUDO_USER" ]]; then
+#     current_pid="self"
+#     current_uid="0"
+#     while [[ "$current_uid" == "0" && "$current_pid" != "0" ]] ; do
+#         current_uid=$(\awk '/^Uid:/ {print $2}' "/proc/${current_pid}/status")
+#         current_pid=$(\awk '/^PPid:/ {print $2}' "/proc/${current_pid}/status")
+#     done
+# 
+#     export SUDO_USER=$(\id -nu "$current_uid")
+# 
+#     unset current_pid
+#     unset current_uid
+# fi
+# echo "$(date --iso-8601=seconds): $SUDO_USER" >> /var/log/sudo_user_login.log
+#
+# if [[ "$SUDO_USER" == "user1" ]]; then
+#     # Added by sangh/profile.
+#     . "$HOME/profile/bashrc_common"
+#     bind -f "$HOME/profile/inputrc_common"
+# elif [[ "$SUDO_USER" == "user1" ]]; then
+#     # Added by sangh/profile.
+#     . "$HOME/profile/bashrc_common"
+#     bind -f "$HOME/profile/inputrc_common"
+# fi
 
 
-if ! [[ -f "$HOME/.tmux.conf" ]]; then
-    echo "Creating a \"$HOME/.tmux.conf\" file."
-fi
-if grep "^${ADDED_BY_LINE}\$" "$HOME/.tmux.conf" >&/dev/null; then
-    echo "------------------  Found \"${ADDED_BY_LINE}\" in \"$HOME/.tmux.conf\"."
+ADDED_BY_LINE="# Added by sangh/profile."
+ADDED_BY_LINE_VI="\"${ADDED_BY_LINE:1}"
+
+if grep "^\\s*${ADDED_BY_LINE}\\s*\$" "$HOME/.tmux.conf" >&/dev/null; then
+    echo "---> Found \"${ADDED_BY_LINE}\" in \".tmux.conf\"."
 else
-    echo "Appending stuff to \"$HOME/.tmux.conf\""
-    echo >> "$HOME/.tmux.conf"
+    echo "Appending stuff to \"$HOME/.tmux.conf\"."
     echo "${ADDED_BY_LINE}" >> "$HOME/.tmux.conf"
     echo "bind-key Space next-window" >> "$HOME/.tmux.conf"
     echo "set -s escape-time 0" >> "$HOME/.tmux.conf"
     echo "set-option -g renumber-windows on" >> "$HOME/.tmux.conf"
 fi
 
-
-echo
-
-
-if ! [[ -f "$HOME/.inputrc" ]]; then
-    echo "Creating a \"$HOME/.inputrc\" file."
-fi
-if grep "^[\$]include $HOME/profile/inputrc_common\$" "$HOME/.inputrc" >&/dev/null; then
-    echo "------------------  Found \"$HOME/profile/inputrc_common\" in \"$HOME/.inputrc\"."
+if [[ -f "$HOME/.inputrc" ]]; then
+    echo "WARNING: \".inputrc\" exists, so \"/etc/inputrc\" is ignored."
 else
-    echo "Appending \"\$include $HOME/profile/inputrc_common\" to \"$HOME/.inputrc\""
-    echo >> "$HOME/.inputrc"
-    echo "${ADDED_BY_LINE}" >> "$HOME/.inputrc"
-    echo "\$include $HOME/profile/inputrc_common" >> "$HOME/.inputrc"
+    echo "---> Found that \".inputrc\" does not exist."
 fi
 
-
-echo
-
-
-if ! [[ -f "$HOME/.bashrc" ]]; then
-    echo "Creating a \"$HOME/.bashrc\" file."
-fi
-if grep "^[.] \"$HOME/profile/bashrc_common\"\$" "$HOME/.bashrc" >&/dev/null; then
-    echo "------------------  Found \"$HOME/profile/bashrc_common\" in \"$HOME/.bashrc\"."
+if grep "^\\s*${ADDED_BY_LINE}\\s*\$" "$HOME/.bashrc" >&/dev/null; then
+    echo "---> Found \"${ADDED_BY_LINE}\" in \".bashrc\"."
 else
-    echo "Appending \". $HOME/profile/bashrc_common\" to \"$HOME/.bashrc\""
-    echo >> "$HOME/.bashrc"
+    echo "Appending stuff to \"$HOME/.bashrc\"."
     echo "${ADDED_BY_LINE}" >> "$HOME/.bashrc"
     echo ". \"$HOME/profile/bashrc_common\"" >> "$HOME/.bashrc"
+    echo "bind -f \"$HOME/profile/inputrc_common\"" >> "$HOME/.bashrc"
 fi
-
-
-echo
-
-
-if ! [[ -f "$HOME/.vimrc" ]]; then
-    echo "Creating a \"$HOME/.vimrc\" file."
-fi
-if grep "^source $HOME/profile/vimrc_common\$" "$HOME/.vimrc" >&/dev/null; then
-    echo "------------------  Found \"$HOME/profile/vimc_common\" in \"$HOME/.vimrc\"."
-else
-    echo "Appending \"source $HOME/profile/vimrc_common\" to \"$HOME/.vimrc\""
-    echo >> "$HOME/.vimrc"
-    echo "\"${ADDED_BY_LINE:1}" >> "$HOME/.vimrc"
-    echo "source $HOME/profile/vimrc_common" >> "$HOME/.vimrc"
-fi
-
-
-echo
-
 
 if [[ -d "$HOME/bin" ]]; then
-    echo "------------------  Found \"$HOME/bin\"."
+    echo "---> Found directory \"bin\"."
 else
-    echo "Creating \"$HOME/bin\"."
+    echo "Making dir \"$HOME/bin\"."
     mkdir "$HOME/bin"
 fi
 
-echo
-
 if [[ -d "$HOME/bin/src" ]]; then
-    echo "------------------  Found \"$HOME/bin/src\"."
+    echo "---> Found directory \"bin/src\"."
 else
-    echo "Creating \"$HOME/bin/src\"."
+    echo "Making dir \"$HOME/bin/src\"."
     mkdir "$HOME/bin/src"
 fi
 
+if [[ -e "/usr/local/bin/python3" ]]; then
+    echo "---> Found \"/usr/local/bin/python3\"."
+else
+    echo "WARNING: It appears \"/usr/local/bin/python3\" does not exist."
+fi
 
-echo
+for p in progress entr icdiff ; do
+    if type -t "${p}" >/dev/null; then
+        echo "---> Found \"${p}\"."
+    else
+        echo "WARNING: The program \"${p}\" not found."
+    fi
+done
 
-
-# Just noting this here for now, but should write this out to check everything
-# and autoload in the future.
-# For Neovim you need a bunch of symlinks (and cearte parent dirs):
+# For Neovim (but will work with regular vim) you need a bunch of symlinks:
 #    .vimrc -> .config/nvim/init.vim
 #    .vim -> .local/share/nvim/
 #    .local/share/nvim/autoload -> site/autoload/
-# by:
-#   mkdir -p "$HOME/.config/nvim"
-#   touch "$HOME/.config/nvim/init.vim"
-#   ln -s .config/nvim/init.vim "$HOME/.vimrc"
-#   mkdir -p "$HOME/.local/share/nvim/site/autoload"
-#   ln -s .local/share/nvim "$HOME/.vim"
-#   ln -s site/autoload "$HOME/.local/share/nvim/autoload"
 
-if [[ -r "$HOME/.vim/autoload/plug.vim" ]]; then
-    echo "------------------  Found \"$HOME/.vim/autoload/plug.vim\"."
+if [[ -e "$HOME/.vimrc" ]]; then
+    if [[ "$(readlink "$HOME/.vimrc")" == ".config/nvim/init.vim" ]]; then
+        echo "---> Found linked \".vimrc\"."
+    else
+        echo "WARNING: \".vimrc\" not linked to the right place."
+    fi
 else
-    if which curl; then
+    echo "Making dir \"$HOME/.config/nvim\"."
+    mkdir -p "$HOME/.config/nvim"
+
+    echo "Touch \"$HOME/.config/nvim/init.vim\"."
+    touch "$HOME/.config/nvim/init.vim"
+
+    echo "Linking \".config/nvim/init.vim\" from \"$HOME/.vimrc\"."
+    ln -s ".config/nvim/init.vim" "$HOME/.vimrc"
+fi
+
+if [[ -e "$HOME/.vim" ]]; then
+    if [[ "$(readlink "$HOME/.vim")" == ".local/share/nvim" ]]; then
+        echo "---> Found linked \".vim\"."
+    else
+        echo "WARNING: \".vim\" not linked to the right place."
+    fi
+else
+    echo "Linking \".local/share/nvim\" from \"$HOME/.vim\"."
+    ln -s ".local/share/nvim" "$HOME/.vim"
+fi
+
+if [[ -e "$HOME/.vim/autoload" ]]; then
+    if [[ "$(readlink "$HOME/.vim/autoload")" == "site/autoload" ]]; then
+        echo "---> Found linked \".vim/autoload\"."
+    else
+        echo "WARNING: \".vim/autoload\" not linked to the right place."
+    fi
+else
+    echo "Making dir \"$HOME/.vim/site/autoload\"."
+    mkdir -p "$HOME/.vim/site/autoload"
+
+    echo "Linking \"site/autoload\" from \"$HOME/.vim/autoload\"."
+    ln -s "site/autoload" "$HOME/.vim/autoload"
+fi
+
+if grep "^\\s*${ADDED_BY_LINE_VI}\\s*\$" "$HOME/.vimrc" >&/dev/null; then
+    echo "---> Found '${ADDED_BY_LINE_VI}' in \".vimrc\"."
+else
+    echo "Appending stuff to \"$HOME/.vimrc\""
+    echo "${ADDED_BY_LINE_VI}" >> "$HOME/.vimrc"
+    echo "source $HOME/profile/vimrc_common" >> "$HOME/.vimrc"
+fi
+
+if [[ -e "$HOME/.vim/autoload/plug.vim" ]]; then
+    echo "---> Found \".vim/autoload/plug.vim\"."
+else
+    if type -t "curl" >/dev/null; then
         curl -fLo "$HOME/.vim/autoload/plug.vim" --create-dirs \
             https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
-    elif which wget; then
-        mkdir -p "$HOME/.vim/autoload"
+    elif type -t "wget" >/dev/null; then
         wget -O "$HOME/.vim/autoload/plug.vim" \
             https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
     else
-        echo -n "Please run: `wget -O \"$HOME/.vim/autoload/plug.vim\" "
-        echo -n "https://raw.githubusercontent.com/junegunn/vim-plug/master/"
-        echo "plug.vim`.  And then hit ENTER."
-        read a
+        echo "WARNING: Neither curl or wget found, cannot get vim-plug."
     fi
-    # No idea if this'll work, generally.
-    vim -c ':PlugInstall|q!|q!'
-fi
-
-
-echo
-
-progs=""
-for p in progress entr icdiff ; do
-    if ! type ${p}; then
-        progs="${progs} ${p}"
+    if [[ -e "$HOME/.vim/autoload/plug.vim" ]]; then
+        vim -c ':PlugInstall|q!|q!'
+    else
+        echo "WARNING: Failed to get vim-plug."
     fi
-done
-if [[ -n "${progs}" ]]; then
-    echo "This/these are NOT INSTALLED, please install them:  ${progs}"
-    echo "Some commands w/URL~s that may be helpful:"
-    echo "    apt install icdiff entr progress"
-    echo "    cd ~/bin/src"
-    echo "    git clone 'https://github.com/jeffkaufman/icdiff'"
-    echo "    git clone 'https://github.com/Xfennec/progress'"
-    echo "    Look at: http://www.entrproject.org/code/ get latest."
-    echo "    Then go into all of them and make and ln to bin."
 fi
 
-if [[ ! -e "/usr/local/bin/python3" ]]; then
-    echo
-    echo "--------------------------"
-    echo
-    echo "It appears that /usr/local/bin/python3 does not exist!"
-fi
-
-echo
-echo "------------------  Done."
-echo
+echo "---> Done."
