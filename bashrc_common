@@ -11,7 +11,6 @@ if [[ $- != *i* ]]; then
     return
 fi
 
-
 # Enable colors for ls, etc.  Prefer $HOME/.dir_colors #64489
 if [[ -f ~/.dir_colors ]]; then
 	eval `dircolors -b ~/.dir_colors`
@@ -104,15 +103,10 @@ export HISTSIZE=999999
 # When do you _not_ want extended globbing?
 shopt -s extglob
 
-
-# Aliases to do the recursive svn add/remove.
-alias svn-addremove="svn st | grep '^\?' | awk '{print \$2}' | xargs svn add && svn st | grep '^\!' | awk '{print \$2}' | xargs svn rm"
-
 # Less is broken: http://seclists.org/fulldisclosure/2014/Nov/74
 export LESS=FRX
 unset LESSOPEN
 unset LESSCLOSE
-
 
 # This is what I use to change directories (dirs).
 # If given no arguments (args) change dir to `$HOME`.
@@ -201,6 +195,9 @@ c() {
     echo "$c_error_str" >&2
     return 1
 }
+
+# Modern linux boxes' dmesg have the -T option, but I'm not removing this
+# function just in case, but if I don't need it in a few years I will.
 dmesg_with_human_timestamps () {
     $(type -P dmesg) "$@" | perl -w -e 'use strict;
         my ($uptime) = do { local @ARGV="/proc/uptime";<>}; ($uptime) = ($uptime =~ /^(\d+)\./);
@@ -208,7 +205,7 @@ dmesg_with_human_timestamps () {
             printf( ($line=~/^\[\s*(\d+)\.\d+\](.+)/) ? ( "[%s]%s\n", scalar localtime(time - $uptime + $1), $2 ) : $line )
         }'
 }
-alias dmesg=dmesg_with_human_timestamps
+alias dmesg='dmesg -T'
 
 # Func to create a `tad` (throw away directory).  Call this, it will spawn a
 # new shell in the newly-created dir, and then when you exit the shell the
@@ -286,10 +283,7 @@ if [[ $EUID -eq 0 ]]; then
 else
     PS1="$PS1"'\[\e[01;32m\]\u@\h\[\e[00m\]:'
 fi
-# Working dir.
 export PROMPT_DIRTRIM=3  # Only disp last 3 dirs with \w in bash > v4.
 export PS1="$PS1"'\[\e[01;34m\]\w\[\e[00;34m\]'"\$git_branch"'\$\[\e[00m\] '
-
-
 
 [ -f "$HOME/.motd" ] && cat "$HOME/.motd"
