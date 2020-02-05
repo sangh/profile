@@ -1,8 +1,0 @@
-
-Host gh
-HostName github.com
-User git  # Yes, git.
-IdentityFile ~/.ssh/id_rsa_gh
-
-git config --add user.email "san.gh@github.com"
-git config --add user.name "San GH"
