@@ -1,80 +1,62 @@
 #!/bin/bash
 
-# This script should be run w/o arguments, and it should check if things
-# need to be added and do nothing if not, displaying any errors.
-# ~/.inputrc is checked b/c it shouldn't exist (if it does the global one
-# isn't used) and the inputrc_common is read from bashrc so that it can be
-# inside an if.  (When this is installed as a root user we want to be able to
-# selectivly not include any of my changes in bashrc, vimrc, or anything else,
-# and inputrc does not have a way to read environment variables.)
+HELP_STR="Install sangh/profile or check if installed.
 
-# The syntax for .tmux.conf is:
-# %if #{==:#{SUDO_USER},user1}
-#     # Added by sangh/profile.
-#     bind-key Space next-window
-# %elif #{==:#{SUDO_USER},user2}
-#     # nothing.
-# %endif
+This script takes no arguments.  It checks if the profile (in this directory)
+should be installed and does so.  Tne following files may be touched:
 
-# The .vimrc syntax is:
-# if 'user1' == $SUDO_USER
-#     " Added by sangh/profile.
-#     source $HOME/profile/vimrc_common
-# elseif 'user1' == $SUDO_USER
-#     set nocompatible  " Must be first: use Vim defaults (much better!)
-#     set tabstop=4  " set the tab stop, duh!
-#     set shiftwidth=4  " the autoindent stuff
-#     set softtabstop=4  " Also sts
-#     set expandtab  " So we get spaces.
-#     set shiftround  " Use muliple of shiftwith with <>
-#     syntax on
-#     colorscheme desert
-#     set mouse=r
-# endif
+    ~/.bashrc
+    ~/.vimrc
+    ~/.tmux.conf
 
-# The bashrc script to find/set SUDO_USER (if not set) is:
-# # This script tries to figure out which user sudo~ed or su~ed or whatever
-# # to root by going up the pid hierarchy until we find a non-root user.
-# # For most non-bastion machines this should already be set (propagated via
-# # SSH).  On base machines obviously there isn't anything to find, and on
-# # instances someone could sudo w/o using a bastion.
-# if [[ -z "$SUDO_USER" ]]; then
-#     current_pid="self"
-#     current_uid="0"
-#     while [[ "$current_uid" == "0" && "$current_pid" != "0" ]] ; do
-#         current_uid=$(\awk '/^Uid:/ {print $2}' "/proc/${current_pid}/status")
-#         current_pid=$(\awk '/^PPid:/ {print $2}' "/proc/${current_pid}/status")
-#     done
-# 
-#     export SUDO_USER=$(\id -nu "$current_uid")
-# 
-#     unset current_pid
-#     unset current_uid
-# fi
-# echo "$(date --iso-8601=seconds): $SUDO_USER" >> /var/log/sudo_user_login.log
-#
-# if [[ "$SUDO_USER" == "user1" ]]; then
-#     # Added by sangh/profile.
-#     . "$HOME/profile/bashrc_common"
-#     bind -f "$HOME/profile/inputrc_common"
-# elif [[ "$SUDO_USER" == "user1" ]]; then
-#     # Added by sangh/profile.
-#     . "$HOME/profile/bashrc_common"
-#     bind -f "$HOME/profile/inputrc_common"
-# fi
+and some warnings are printed if some programs or links are not found.
 
+The file ~/.inputrc is checked to not exist (if it does the global one ins't
+used) because it can be read from bashrc and then can be within an if block.
+
+Neovim puts config files in different places from vim, so we check that the
+symlinks that link the vim places point to the neovim places.
+
+If this is called as a non-root user then things are sourced directly form
+the three files above.  If \$USER is root then the sourcing in the three
+files above happens inside an if statement (with code to check if the user
+used sudo or su).  Unless the three files above are modified (either to change
+the checked user names for names that may sudo or su or to remove the if
+statements) then re-logging in as root will appear to have no effect.
+"
+
+if [[ $# -ne 0 ]]; then
+    echo "$HELP_STR"
+    exit 1
+elif [[ -z "$USER" || -z "$HOME" ]]; then
+    echo "ERROR: Either \$USER or \$HOME is empty or unset."
+    exit 1
+fi
 
 ADDED_BY_LINE="# Added by sangh/profile."
 ADDED_BY_LINE_VI="\"${ADDED_BY_LINE:1}"
 
+DOT_TMUX_CONF=$(cat << EOF
+${ADDED_BY_LINE}
+bind-key Space next-window
+set -s escape-time 0
+set-option -g renumber-windows on
+EOF
+)
+
 if grep "^\\s*${ADDED_BY_LINE}\\s*\$" "$HOME/.tmux.conf" >&/dev/null; then
     echo "---> Found \"${ADDED_BY_LINE}\" in \".tmux.conf\"."
+elif [[ "$USER" == "root" ]]; then
+    echo "Appending conditional stuff to \"$HOME/.tmux.conf\"."
+    (   echo '%if #{==:#{SUDO_USER},user1}'
+        echo "$DOT_TMUX_CONF" | sed -e 's/^/    /'
+        echo '%elif #{==:#{SUDO_USER},user2}'
+        echo "$DOT_TMUX_CONF" | sed -e 's/^/    /'
+        echo '%endif'
+    ) >> "$HOME/.tmux.conf"
 else
     echo "Appending stuff to \"$HOME/.tmux.conf\"."
-    echo "${ADDED_BY_LINE}" >> "$HOME/.tmux.conf"
-    echo "bind-key Space next-window" >> "$HOME/.tmux.conf"
-    echo "set -s escape-time 0" >> "$HOME/.tmux.conf"
-    echo "set-option -g renumber-windows on" >> "$HOME/.tmux.conf"
+	echo "$DOT_TMUX_CONF" >> "$HOME/.tmux.conf"
 fi
 
 if [[ -f "$HOME/.inputrc" ]]; then
@@ -83,13 +65,49 @@ else
     echo "---> Found that \".inputrc\" does not exist."
 fi
 
+DOT_BASHRC_SUDO_USER_SCRIPT=$(cat << 'EOF'
+# This script tries to figure out which user used sudo or su to get root
+# by going up the proc hierarchy until a non-root user is found.
+# For most machines this should already be set (if propagated via SSH).
+if [[ -z "$SUDO_USER" ]]; then
+    current_pid="self"
+    current_uid="0"
+    while [[ "$current_uid" == "0" && "$current_pid" != "0" ]] ; do
+        current_uid=$(\awk '/^Uid:/ {print $2}' "/proc/${current_pid}/status")
+        current_pid=$(\awk '/^PPid:/ {print $2}' "/proc/${current_pid}/status")
+    done
+
+    export SUDO_USER=$(\id -nu "$current_uid")
+
+    unset current_pid
+    unset current_uid
+fi
+echo "$(date --iso-8601=seconds): $SUDO_USER" >> /var/log/sudo_user_login.log
+EOF
+)
+
+DOT_BASHRC=$(cat << EOF
+${ADDED_BY_LINE}
+. "$HOME/profile/bashrc_common"
+bind -f "$HOME/profile/inputrc_common"
+EOF
+)
+
 if grep "^\\s*${ADDED_BY_LINE}\\s*\$" "$HOME/.bashrc" >&/dev/null; then
     echo "---> Found \"${ADDED_BY_LINE}\" in \".bashrc\"."
+elif [[ "$USER" == "root" ]]; then
+    echo "Appending conditional stuff to \"$HOME/.bashrc\"."
+    (   echo "$DOT_BASHRC_SUDO_USER_SCRIPT"
+        echo
+        echo 'if [[ "$SUDO_USER" == "user1" ]]; then'
+        echo "$DOT_BASHRC" | sed -e 's/^/    /'
+        echo 'elif [[ "$SUDO_USER" == "user2" ]]; then'
+        echo "$DOT_BASHRC" | sed -e 's/^/    /'
+        echo 'fi'
+    ) >> "$HOME/.bashrc"
 else
     echo "Appending stuff to \"$HOME/.bashrc\"."
-    echo "${ADDED_BY_LINE}" >> "$HOME/.bashrc"
-    echo ". \"$HOME/profile/bashrc_common\"" >> "$HOME/.bashrc"
-    echo "bind -f \"$HOME/profile/inputrc_common\"" >> "$HOME/.bashrc"
+	echo "$DOT_BASHRC" >> "$HOME/.bashrc"
 fi
 
 if [[ -d "$HOME/bin" ]]; then
@@ -112,13 +130,15 @@ else
     echo "WARNING: It appears \"/usr/local/bin/python3\" does not exist."
 fi
 
-for p in progress entr icdiff ; do
+progs_found=""
+for p in progress entr icdiff combine; do
     if type -t "${p}" >/dev/null; then
-        echo "---> Found \"${p}\"."
+        progs_found="${progs_found}\"${p}\" "
     else
         echo "WARNING: The program \"${p}\" not found."
     fi
 done
+echo "---> Found programs: ${progs_found}."
 
 # For Neovim (but will work with regular vim) you need a bunch of symlinks:
 #    .vimrc -> .config/nvim/init.vim
@@ -167,12 +187,38 @@ else
     ln -s "site/autoload" "$HOME/.vim/autoload"
 fi
 
+DOT_VIMRC=$(cat << EOF
+${ADDED_BY_LINE_VI}
+source $HOME/profile/vimrc_common
+EOF
+)
+
+DOT_VIMRC_USER2=$(cat << 'EOF'
+set nocompatible  " Must be first: use Vim defaults (much better!)
+set tabstop=4  " set the tab stop, duh!
+set shiftwidth=4  " the autoindent stuff
+set softtabstop=4  " Also sts
+set expandtab  " So we get spaces.
+set shiftround  " Use muliple of shiftwith with <>
+syntax on
+colorscheme desert
+set mouse=r
+EOF
+)
+
 if grep "^\\s*${ADDED_BY_LINE_VI}\\s*\$" "$HOME/.vimrc" >&/dev/null; then
     echo "---> Found '${ADDED_BY_LINE_VI}' in \".vimrc\"."
+elif [[ "$USER" == "root" ]]; then
+    echo "Appending conditional stuff to \"$HOME/.vimrc\"."
+    (   echo "if 'user1' == \$SUDO_USER"
+        echo "$DOT_VIMRC" | sed -e 's/^/    /'
+        echo "elseif 'user2' == \$SUDO_USER"
+        echo "$DOT_VIMRC_USER2" | sed -e 's/^/    /'
+        echo "endif"
+    ) >> "$HOME/.vimrc"
 else
-    echo "Appending stuff to \"$HOME/.vimrc\""
-    echo "${ADDED_BY_LINE_VI}" >> "$HOME/.vimrc"
-    echo "source $HOME/profile/vimrc_common" >> "$HOME/.vimrc"
+    echo "Appending stuff to \"$HOME/.vimrc\"."
+    echo "$DOT_VIMRC" >> "$HOME/.vimrc"
 fi
 
 if [[ -e "$HOME/.vim/autoload/plug.vim" ]]; then
