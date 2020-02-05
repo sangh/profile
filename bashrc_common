@@ -36,27 +36,28 @@ function d() {
         du -hs "$@"
     fi    
 }
+
 unalias v >&/dev/null
 unset v
-if type -t vim >& /dev/null; then
+if type -t nvim >& /dev/null; then
+	EDITOR=nvim
+elif type -t vim >& /dev/null; then
 	EDITOR=vim
-	VISUAL=vim
-	export EDITOR VISUAL
-	function v() {
-        for a in "$@"; do
-            if [[ -e "$arg" && $(du -k "$arg"|cut -f1) -ge 1024 ]]; then
-                vim -n "$@"
-                return
-            fi
-        done
-        vim "$@"
-    }
 elif type -t vi >& /dev/null; then
 	EDITOR=vi
-	VISUAL=vi
-	export EDITOR VISUAL
-	alias v='vi'
 fi
+VISUAL=$EDITOR
+export EDITOR VISUAL
+function v() {
+    for arg in "$@"; do
+        if [[ -e "$arg" && $(du -k "$arg"|cut -f1) -ge 1024 ]]; then
+            "$EDITOR" -n "$@"
+            return
+        fi
+    done
+    "$EDITOR" "$@"
+}
+
 alias mv='mv -i'
 alias cp='cp -i'
 alias xa='xargs -I \{\} -n 1 -P 50'
