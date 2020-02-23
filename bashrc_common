@@ -223,7 +223,7 @@ tad() {
     fi
 }
 
-alias t='exec tmux attach'
+alias t='if [[ -n "${TMUX+x}" ]]; then echo "Inside a session?"; else exec tmux attach; fi'
 
 # Git aliases, same everywhere.
 alias gs='git status'
