@@ -88,6 +88,7 @@ EOF
 
 DOT_BASHRC=$(cat << EOF
 ${ADDED_BY_LINE}
+[[ \$- != *i* ]] && return  # Don't do anything unless bash is interactive.
 . "$HOME/profile/bashrc_common"
 bind -f "$HOME/profile/inputrc_common"
 EOF

@@ -5,12 +5,6 @@
 # the interactive check in that file, if it has one.
 umask 0002
 
-# If this shell is not interactive, do nothing below this.
-if [[ $- != *i* ]]; then
-    # This shell is not interactive.
-    return
-fi
-
 # Enable colors for ls, etc.  Prefer $HOME/.dir_colors #64489
 if [[ -f ~/.dir_colors ]]; then
 	eval `dircolors -b ~/.dir_colors`
