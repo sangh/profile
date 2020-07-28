@@ -1,0 +1,24 @@
+# Keys next to each other on a split Colemak keyboard.
+# In .aspell.conf you can only refer to files in the system directory,
+# so you have to prepend the "keyboard" directive with some ../../ ...
+# to trick it into seeing this file.
+qw
+wf
+fp
+pg
+jl
+lu
+uy
+ar
+rs
+st
+td
+hn
+ne
+ei
+io
+zx
+xc
+cv
+vb
+km
