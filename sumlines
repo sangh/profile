@@ -4,9 +4,9 @@ help_ = """
 Usage:  sumlines [--help] [--date YYYY-MM-DD | --json] [--] [filename]
 
     If no arguments are given, read lines from stdin, discard blank
-    lines, expect non-blank lines to start with a float followed by
-    white space, and then print the sum of all those floats (plus a
-    newline) to stdout.
+    lines, expect non-blank lines to start with a float (with any
+    commas removed) followed by white space, and then print the sum
+    of all those floats (plus a newline) to stdout.
 
     Any errors or warnings are printed to stderr.  If a file name
     if given read from that file and do not read stdin at all.
@@ -119,7 +119,7 @@ def parse_line(line):
     description.
     """
     line_split = line.split()
-    amt = float(line_split[0])
+    amt = float(line_split[0].replace(",", ""))
     date = ''
     for date_idx in range(len(line_split)-1, 1, -1):
         if parse_line_date_regex.match(line_split[date_idx]):
