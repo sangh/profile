@@ -11,7 +11,7 @@ $if Bash
     set mark-directories on
     set mark-symlinked-directories on
 
-    # Match all files
-    set match-hidden-files on
+    # Tab complete won't complete hidden files.
+    set match-hidden-files off
 
 $endif
