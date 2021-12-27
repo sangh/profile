@@ -222,7 +222,7 @@ alias t='if [[ -n "${TMUX+x}" ]]; then echo "Inside a session?"; else exec tmux 
 # Git aliases, same everywhere.
 alias gs='git status'
 alias gb='git remote -v;git branch -v'
-alias go='git checkout'
+alias gg='git checkout'
 alias gt='git log --graph --decorate --pretty=oneline --abbrev-commit'
 alias gd='git icdiff'
 alias gdn='git icdiff --name-only'
