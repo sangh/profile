@@ -60,7 +60,7 @@ if ! grep --color >&/dev/null; then
 	alias grep="grep --color"
 fi
 alias g='grep -iE'
-alias gr='grep -rinsEH'
+alias gr='grep -RinsEH'
 
 function p() {
     if [[ 0 -eq $# ]]; then
