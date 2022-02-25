@@ -138,7 +138,7 @@ if has('nvim')
     execute 'nnoremap <leader>ah :w!<CR>:terminal aspell --dont-backup --encoding=UTF-8 --mode=html check "%"<CR>:e! "%"<CR><CR>'
     execute 'nnoremap <leader>at :w!<CR>:terminal aspell --dont-backup --encoding=UTF-8 --mode=tex check "%"<CR>:e! "%"<CR><CR>'
     " Neovim's term starts in normal mode and keeps the buf open after end.
-    autocmd TermOpen term://*aspell* startinsert
+    autocmd TermOpen term://*aspell* call feedkeys('i')
     autocmd TermClose term://*aspell* call feedkeys('<cr>')
 else
     execute 'nnoremap <leader>aa :w!<CR>:!aspell --dont-backup --encoding=UTF-8 --mode=none check "%"<CR>:e! "%"<CR><CR>'
