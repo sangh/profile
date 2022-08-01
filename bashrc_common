@@ -51,6 +51,11 @@ function v() {
     done
     "$EDITOR" "$@"
 }
+if [[ $OSTYPE == 'darwin'* ]]; then
+    alias vv='v /tmp/s; pbcopy </tmp/s'
+else
+    alias vv='v /tmp/s'
+fi
 
 alias mv='mv -i'
 alias cp='cp -i'
