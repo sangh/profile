@@ -8,4 +8,4 @@ if [[ '^' != "${search:0:1}" ]]; then
 fi
 
 shift
-find . -follow -iregex "$search" "$@"
+bfs . -follow -iregex "$search" "$@"

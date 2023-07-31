@@ -138,7 +138,7 @@ else
 fi
 
 progs_found=""
-for p in progress entr icdiff combine aspell; do
+for p in progress entr icdiff combine aspell bfs vidir; do
     if type -t "${p}" >/dev/null; then
         progs_found="${progs_found}\"${p}\" "
     else
