@@ -14,4 +14,7 @@ $if Bash
     # Tab complete won't complete hidden files.
     set match-hidden-files off
 
+    # This throws away edits in the history when you edit with CTRL-R.
+    set revert-all-at-newline on
+
 $endif
