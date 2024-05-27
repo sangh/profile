@@ -222,7 +222,7 @@ tad() {
     fi
 }
 
-alias t='tmux new -A'
+alias t='exec tmux new -A'
 
 # Git aliases, same everywhere.
 alias gs='git status'
