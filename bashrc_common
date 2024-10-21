@@ -79,6 +79,12 @@ if cal -3 >&/dev/null; then
 	alias cal='cal -3'
 fi
 
+if type -t fd >/dev/null; then
+    if type -t fdfind >/dev/null; then
+        alias fd=fdfind
+    fi
+fi
+
 # PATH stuff:  The user's bin is more important than everything, then
 # profile after everything else, and then finally the local dir at the end.
 PATH="$HOME/bin:$PATH"
