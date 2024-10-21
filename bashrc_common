@@ -79,7 +79,7 @@ if cal -3 >&/dev/null; then
 	alias cal='cal -3'
 fi
 
-if type -t fd >/dev/null; then
+if ! type -t fd >/dev/null; then
     if type -t fdfind >/dev/null; then
         alias fd=fdfind
     fi
