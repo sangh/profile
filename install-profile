@@ -137,8 +137,14 @@ else
     echo "WARNING: \"$HOME/.aspell.conf\" does not exist."
 fi
 
+if ! type -t fd >/dev/null; then
+    if type -t fdfind >/dev/null; then
+        alias fd=fdfind
+    fi
+fi
+
 progs_found=""
-for p in progress entr icdiff combine aspell bfs vidir; do
+for p in progress entr icdiff combine aspell bfs vidir sd fd; do
     if type -t "${p}" >/dev/null; then
         progs_found="${progs_found}\"${p}\" "
     else
