@@ -26,10 +26,18 @@ statements) then re-logging in as root will appear to have no effect.
 "
 
 if [[ $# -ne 0 ]]; then
-    echo "$HELP_STR"
+    echo "$HELP_STR" >&2
     exit 1
 elif [[ -z "$USER" || -z "$HOME" ]]; then
-    echo "ERROR: Either \$USER or \$HOME is empty or unset."
+    echo "ERROR: Either \$USER or \$HOME is empty or unset." >&2
+    exit 1
+fi
+PROFILE_DIR=$(dirname $(realpath "${BASH_SOURCE[0]}"))
+if [[ ! -d "$PROFILE_DIR" ]]; then
+    echo "Profile directory not found: \"$PROFILE_DIR\"" >&2
+    exit 1
+elif [[ "$(basename "$PROFILE_DIR")" != "profile" ]]; then
+    echo "Profile directory not named profile?" >&2
     exit 1
 fi
 
@@ -89,8 +97,8 @@ EOF
 DOT_BASHRC=$(cat << EOF
 ${ADDED_BY_LINE}
 [[ \$- != *i* ]] && return  # Don't do anything unless bash is interactive.
-. "$HOME/profile/bashrc_common"
-bind -f "$HOME/profile/inputrc_common"
+. "${PROFILE_DIR}/bashrc_common"
+bind -f "${PROFILE_DIR}/inputrc_common"
 EOF
 )
 
@@ -116,13 +124,6 @@ if [[ -d "$HOME/bin" ]]; then
 else
     echo "Making dir \"$HOME/bin\"."
     mkdir "$HOME/bin"
-fi
-
-if [[ -d "$HOME/bin/src" ]]; then
-    echo "---> Found directory \"bin/src\"."
-else
-    echo "Making dir \"$HOME/bin/src\"."
-    mkdir "$HOME/bin/src"
 fi
 
 if [[ -e "/usr/local/bin/python3" ]]; then
@@ -204,7 +205,7 @@ fi
 
 DOT_VIMRC=$(cat << EOF
 ${ADDED_BY_LINE_VI}
-source $HOME/profile/vimrc_common
+source ${PROFILE_DIR}/vimrc_common
 EOF
 )
 
