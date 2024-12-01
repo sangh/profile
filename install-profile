@@ -144,8 +144,9 @@ if ! type -t fd >/dev/null; then
     fi
 fi
 
+# On Debian it's: sudo apt install n progress entr icdiff aspell sd fd-find moreutils
 progs_found=""
-for p in progress entr icdiff combine aspell bfs vidir sd fd; do
+for p in progress entr icdiff aspell vidir sd fd; do
     if type -t "${p}" >/dev/null; then
         progs_found="${progs_found}\"${p}\" "
     else
