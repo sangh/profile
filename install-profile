@@ -126,12 +126,6 @@ else
     mkdir "$HOME/bin"
 fi
 
-if [[ -e "/usr/local/bin/python3" ]]; then
-    echo "---> Found \"/usr/local/bin/python3\"."
-else
-    echo "WARNING: It appears \"/usr/local/bin/python3\" does not exist."
-fi
-
 if [[ -e "$HOME/.aspell.conf" ]]; then
     echo "---> Found \"$HOME/.aspell.conf\"."
 else

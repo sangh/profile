@@ -1,4 +1,4 @@
-#!/usr/local/bin/python3
+#!/usr/bin/python3
 
 help_ = """
 Usage:  sumlines [--help] [--date YYYY-MM-DD | --json] [--] [filename]
