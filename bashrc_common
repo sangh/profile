@@ -44,7 +44,7 @@ VISUAL=$EDITOR
 export EDITOR VISUAL
 function v() {
     for arg in "$@"; do
-        if [[ -e "$arg" && $(du -k "$arg"|cut -f1) -ge 1024 ]]; then
+        if [[ -e "$arg" && $(du -sk "$arg"|cut -f1) -ge 1024 ]]; then
             less "$@"
             return
         fi
