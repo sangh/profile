@@ -58,7 +58,6 @@ set softtabstop=4  " Also sts
 set expandtab  " So we get spaces.
 set shiftround  " Use muliple of shiftwith with <>
 set nofoldenable  " Start w/o folds, enable when a fold cmd is used.
-set pastetoggle=<F11>
 set scrolloff=5  "Keep five lines showeng around cursor.
 " Wrap long lines in the buffer, but wrap on-screen at word boundries.
 set textwidth=0
