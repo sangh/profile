@@ -46,9 +46,7 @@ ADDED_BY_LINE_VI="\"${ADDED_BY_LINE:1}"
 
 DOT_TMUX_CONF=$(cat << EOF
 ${ADDED_BY_LINE}
-bind-key Space next-window
-set -s escape-time 0
-set-option -g renumber-windows on
+source-file ~/profile/tmux_conf_common
 EOF
 )
 
