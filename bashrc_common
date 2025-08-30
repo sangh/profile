@@ -87,9 +87,7 @@ fi
 
 # PATH stuff:  The user's bin is more important than everything, then
 # profile after everything else, and then finally the local dir at the end.
-PATH="$HOME/bin:$PATH"
-PATH="$PATH:$HOME/profile"
-PATH="$PATH:."
+PATH="$HOME/.local/bin:$HOME/bin:$PATH:$HOME/profile:."
 export PATH
 
 # Check the window size after every command.
