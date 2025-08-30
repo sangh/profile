@@ -1,0 +1,5 @@
+bind-key Space next-window
+set -s escape-time 0
+set-option -g renumber-windows on
+set-option -sa terminal-overrides ',xterm-256color:RGB'
+set-option -g focus-events on
