@@ -226,7 +226,8 @@ tad() {
     fi
 }
 
-alias t='exec tmux new -A'
+#Will usually have a new enough bash.
+alias t='[[ -v TMUX ]] && echo "ERROR: Inside tmux?">&2 || exec tmux new -A'
 
 # Git aliases, same everywhere.
 alias gs='git status'
