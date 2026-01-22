@@ -78,6 +78,7 @@ set fileformats+=mac
 set modelines=0  " Do not use modelines, from other people.
 set hidden  "Save the buffer, like when useing :e
 set ai  "autoindent (cp prev line), some plugins enable in, so set it.
+set number
 filetype plugin indent on
 " Don't use Ex mode, use Q for formatting
 noremap Q gq
