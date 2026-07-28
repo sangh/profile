@@ -132,8 +132,9 @@ if [[ -e "$HOME/.aspell.conf" ]]; then
     fi
 else
     echo "Creating \"$HOME/.aspell.conf\"."
-    echo "# Added by sangh/profile." >> "$HOME/.aspell.conf"
-    echo "conf-dir /home/san/profile" >> "$HOME/.aspell.conf"
+    echo "$ADDED_BY_LINE" >> "$HOME/.aspell.conf"
+    echo "conf-dir $PROFILE_DIR" >> "$HOME/.aspell.conf"
+    echo "local-data-dir $PROFILE_DIR" >> "$HOME/.aspell.conf"
 fi
 
 shopt -s expand_aliases
