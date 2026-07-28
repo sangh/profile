@@ -125,9 +125,15 @@ else
 fi
 
 if [[ -e "$HOME/.aspell.conf" ]]; then
-    echo "---> Found \"$HOME/.aspell.conf\"."
+    if [[ $(aspell dump config master) == "en_CA" ]]; then
+        echo "---> Found \"$HOME/.aspell.conf\", with en_CA."
+    else
+        echo "WARNING: aspell dump config master does not return en_CA."
+    fi
 else
-    echo "WARNING: \"$HOME/.aspell.conf\" does not exist."
+    echo "Creating \"$HOME/.aspell.conf\"."
+    echo "# Added by sangh/profile." >> "$HOME/.aspell.conf"
+    echo "conf-dir /home/san/profile" >> "$HOME/.aspell.conf"
 fi
 
 shopt -s expand_aliases
